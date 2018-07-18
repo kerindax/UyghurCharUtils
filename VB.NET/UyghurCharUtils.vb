@@ -60,7 +60,7 @@ Public Class UyghurCharUtils
         source = _BasicLa(source)
         For i = 0 To source.Length - 1
             ch = source.Substring(i, 1)
-            target += _GetCode(ch, 0)
+            target += ChrW(_GetCode(ch, 0))
         Next
         Return target
     End Function
