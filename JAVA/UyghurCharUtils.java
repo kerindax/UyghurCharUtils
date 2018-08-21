@@ -29,22 +29,22 @@ public class UyghurCharUtils {
             if (length > 1) {
                 target = str.substring(0, 1);
                 ch = _GetCode(target, 2);
-                returns += ChrW(ch);
+                returns += _ChrW(ch);
                 for (int i = 0; i < length - 2; i++) {
                     target = str.substring(i, i + 1);
                     target2 = str.substring(i + 1, i + 2);
                     p = _GetCode(target, 5);
                     ch = _GetCode(target2, p + 2);
-                    returns += ChrW(ch);
+                    returns += _ChrW(ch);
                 }
                 target = str.substring(length - 2, length - 1);
                 target2 = str.substring(length - 1, length);
                 p = _GetCode(target, 5) * 3;
                 ch = _GetCode(target2, 1 + p);
-                returns += ChrW(ch);
+                returns += _ChrW(ch);
             } else {
                 ch = _GetCode(str, 1);
-                returns += ChrW(ch);
+                returns += _ChrW(ch);
             }
 
             m.appendReplacement(sb, _ExtendLa(returns.trim()));
@@ -65,7 +65,7 @@ public class UyghurCharUtils {
         source = _BasicLa(source);
         for (int i = 0; i < source.length(); i++) {
             ch = source.substring(i, i + 1);
-            target += ChrW(_GetCode(ch, 0));
+            target += _ChrW(_GetCode(ch, 0));
         }
 
         return target;
@@ -140,13 +140,13 @@ public class UyghurCharUtils {
     private String _ExtendLa(String source) {
         Pattern reg1 = Pattern.compile("(\\uFEDF\\uFE8E)");
         Pattern reg2 = Pattern.compile("(\\uFEE0\\uFE8E)");
-        return reg2.matcher(reg1.matcher(source).replaceAll(ChrW(0xFEFB))).replaceAll(ChrW(0xFEFC));
+        return reg2.matcher(reg1.matcher(source).replaceAll(_ChrW(0xFEFB))).replaceAll(_ChrW(0xFEFC));
     }
 
     private String _BasicLa(String source) {
         Pattern reg1 = Pattern.compile("(\\uFEFB)");
         Pattern reg2 = Pattern.compile("(\\uFEFC)");
-        return reg2.matcher(reg1.matcher(source).replaceAll(ChrW(0xFEDF) + ChrW(0xFE8E))).replaceAll(ChrW(0xFEE0) + ChrW(0xFE8E));
+        return reg2.matcher(reg1.matcher(source).replaceAll(_ChrW(0xFEDF) + _ChrW(0xFE8E))).replaceAll(_ChrW(0xFEE0) + _ChrW(0xFE8E));
     }
 
     private int _GetCode(String source, int index) {
@@ -155,25 +155,25 @@ public class UyghurCharUtils {
             return 0;
         }
         if (index > 5) {
-            return AscW(source);
+            return _AscW(source);
         }
         for (int i = 0; i < 33; i++) {
-            if (AscW(source) == U[i][0]) {
+            if (_AscW(source) == U[i][0]) {
                 return U[i][index];
             }
         }
-        return AscW(source);
+        return _AscW(source);
     }
 
-    public static int AscW(char ch) {
+    public static int _AscW(char ch) {
         return Integer.valueOf(ch);//.intValue();
     }
 
-    public static int AscW(String source) {
-        return AscW(source.charAt(0));
+    public static int _AscW(String source) {
+        return _AscW(source.charAt(0));
     }
 
-    public static String ChrW(int code) {
+    public static String _ChrW(int code) {
         return String.valueOf((char) code);
     }
 }
