@@ -17,22 +17,22 @@ var UyghurCharUtils = window.UyghurCharUtils = class UyghurCharUtils {
       if (length > 1) {
         target = str.substr(0, 1);
         ch = that._GetCode(target, 2);
-        returns += String.fromCharCode(ch);
+        returns += _ChrW(ch);
         for (var i = 0; i <= length - 3; i++) {
           target = str.substr(i, 1);
           target2 = str.substr(i + 1, 1);
           p = that._GetCode(target, 5);
           ch = that._GetCode(target2, 2 + p);
-          returns += String.fromCharCode(ch);
+          returns += _ChrW(ch);
         }
         target = str.substr(length - 2, 1);
         target2 = str.substr(length - 1, 1);
         p = that._GetCode(target, 5) * 3;
         ch = that._GetCode(target2, 1 + p);
-        returns += String.fromCharCode(ch);
+        returns += _ChrW(ch);
       } else {
         ch = that._GetCode(str, 1);
-        returns += String.fromCharCode(ch);
+        returns += _ChrW(ch);
       }
       return that._ExtendLa(returns.trim());
     });
@@ -74,28 +74,33 @@ var UyghurCharUtils = window.UyghurCharUtils = class UyghurCharUtils {
   }
   _ExtendLa(source) {
     return source.replace(/(\uFEDF\uFE8E)/g, function (word) {
-      return String.fromCharCode(0xFEFB);
+      return _ChrW(0xFEFB);
     }).replace(/(\uFEE0\uFE8E)/g, function (word) {
-      return String.fromCharCode(0xFEFC);
+      return _ChrW(0xFEFC);
     });
   }
   _BasicLa(source) {
     return source.replace(/(\uFEFB)/g, function (word) {
-      return String.fromCharCode(0xFEDF) + String.fromCharCode(0xFE8E);
+      return _ChrW(0xFEDF) + _ChrW(0xFE8E);
     }).replace(/(\uFEFC)/g, function (word) {
-      return String.fromCharCode(0xFEE0) + String.fromCharCode(0xFE8E);
+      return _ChrW(0xFEE0) + _ChrW(0xFE8E);
     });
   }
   _GetCode(source, index) {
     if (source.length == 0)
       return 0;
     if (index > 5)
-      return source.charCodeAt();
+      return _AscW(source);
     for (var i = 0; i <= 32; i++) {
-      if (source.charCodeAt() == U[i][0])
+      if (_AscW(source) == U[i][0])
         return U[i][index];
     }
+    return _AscW(source);
+  }
+  _AscW(source) {
     return source.charCodeAt();
   }
+  _ChrW(number) {
+    return _ChrW(number);
+  }
 }
-
