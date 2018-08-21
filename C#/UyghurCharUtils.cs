@@ -129,9 +129,13 @@ namespace Uyghur
             }
             return _AscW(source);
         }
+        private int _AscW(char ch)
+        {
+            return Convert.ToChar(ch);
+        }
         private int _AscW(string source)
         {
-            return Convert.ToChar(source[0]);
+            return _AscW(source[0]);
         }
         private string _ChrW(int number)
         {
