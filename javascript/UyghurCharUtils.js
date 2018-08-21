@@ -17,28 +17,28 @@ var UyghurCharUtils = window.UyghurCharUtils = class UyghurCharUtils {
       if (length > 1) {
         target = str.substr(0, 1);
         ch = that._GetCode(target, 2);
-        returns += _ChrW(ch);
+        returns += that._ChrW(ch);
         for (var i = 0; i <= length - 3; i++) {
           target = str.substr(i, 1);
           target2 = str.substr(i + 1, 1);
           p = that._GetCode(target, 5);
           ch = that._GetCode(target2, 2 + p);
-          returns += _ChrW(ch);
+          returns += that._ChrW(ch);
         }
         target = str.substr(length - 2, 1);
         target2 = str.substr(length - 1, 1);
         p = that._GetCode(target, 5) * 3;
         ch = that._GetCode(target2, 1 + p);
-        returns += _ChrW(ch);
+        returns += that._ChrW(ch);
       } else {
         ch = that._GetCode(str, 1);
-        returns += _ChrW(ch);
+        returns += that._ChrW(ch);
       }
       return that._ExtendLa(returns.trim());
     });
   }
   /**基本区  转换   反向扩展区*/
-  Basic2RExtend(source){
+  Basic2RExtend(source) {
     var ThisText = this.Basic2Extend(source);
     var ReverseString = this._ReverseString(ThisText);
     return this._ReverseAscii(ReverseString);
@@ -49,7 +49,7 @@ var UyghurCharUtils = window.UyghurCharUtils = class UyghurCharUtils {
     var target = '';
     source = this._BasicLa(source);
     for (i = 0; i < source.length; i++) {
-      ch = source.substr(i , 1);
+      ch = source.substr(i, 1);
       target += this._GetChar(ch, 0);
     }
     return target;
@@ -62,7 +62,7 @@ var UyghurCharUtils = window.UyghurCharUtils = class UyghurCharUtils {
     return target;
   }
 
-  _ReverseAscii(source){
+  _ReverseAscii(source) {
     var that = this;
     return source.replace(/([^\uFB00-\uFEFF\u0600-\u06FF\s]+)/g, function (word) {
       return that._ReverseString(word);
@@ -73,34 +73,36 @@ var UyghurCharUtils = window.UyghurCharUtils = class UyghurCharUtils {
     return newstr;
   }
   _ExtendLa(source) {
+    var that = this
     return source.replace(/(\uFEDF\uFE8E)/g, function (word) {
-      return _ChrW(0xFEFB);
+      return that._ChrW(0xFEFB);
     }).replace(/(\uFEE0\uFE8E)/g, function (word) {
-      return _ChrW(0xFEFC);
+      return that._ChrW(0xFEFC);
     });
   }
   _BasicLa(source) {
+    var that = this
     return source.replace(/(\uFEFB)/g, function (word) {
-      return _ChrW(0xFEDF) + _ChrW(0xFE8E);
+      return that._ChrW(0xFEDF) + that._ChrW(0xFE8E);
     }).replace(/(\uFEFC)/g, function (word) {
-      return _ChrW(0xFEE0) + _ChrW(0xFE8E);
+      return that._ChrW(0xFEE0) + that._ChrW(0xFE8E);
     });
   }
   _GetCode(source, index) {
     if (source.length == 0)
       return 0;
     if (index > 5)
-      return _AscW(source);
+      return this._AscW(source);
     for (var i = 0; i <= 32; i++) {
-      if (_AscW(source) == U[i][0])
+      if (this._AscW(source) == U[i][0])
         return U[i][index];
     }
-    return _AscW(source);
+    return this._AscW(source);
   }
   _AscW(source) {
     return source.charCodeAt();
   }
   _ChrW(number) {
-    return _ChrW(number);
+    return String.fromCharCode(number) ;
   }
 }
