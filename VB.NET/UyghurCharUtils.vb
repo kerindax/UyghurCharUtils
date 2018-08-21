@@ -19,22 +19,22 @@ Public Class UyghurCharUtils
                 If length > 1 Then
                     target = str.Substring(0, 1)
                     ch = _GetCode(target, 2)
-                    returns &= ChrW(ch)
+                    returns &= _ChrW(ch)
                     For i = 0 To length - 3
                         target = str.Substring(i, 1)
                         target2 = str.Substring(i + 1, 1)
                         p = _GetCode(target, 5)
                         ch = _GetCode(target2, 2 + p)
-                        returns &= ChrW(ch)
+                        returns &= _ChrW(ch)
                     Next
                     target = str.Substring(length - 2, 1)
                     target2 = str.Substring(length - 1, 1)
                     p = _GetCode(target, 5) * 3
                     ch = _GetCode(target2, 1 + p)
-                    returns &= ChrW(ch)
+                    returns &= _ChrW(ch)
                 Else
                     ch = _GetCode(str, 1)
-                    returns &= ChrW(ch)
+                    returns &= _ChrW(ch)
                 End If
                 Return _ExtendLa(returns.Trim())
             End Function)
@@ -52,7 +52,7 @@ Public Class UyghurCharUtils
         source = _BasicLa(source)
         For i = 0 To source.Length - 1
             ch = source.Substring(i, 1)
-            target += ChrW(_GetCode(ch, 0))
+            target += _ChrW(_GetCode(ch, 0))
         Next
         Return target
     End Function
@@ -77,10 +77,10 @@ Public Class UyghurCharUtils
         Dim reg2 As New Regex("(\uFEE0\uFE8E)")
         Return reg2.Replace(reg1.Replace(source,
                            Function(word)
-                               Return ChrW(&HFEFB)
+                               Return _ChrW(&HFEFB)
                            End Function),
                            Function(word)
-                               Return ChrW(&HFEFC)
+                               Return _ChrW(&HFEFC)
                            End Function)
     End Function
     Private Function _BasicLa(source As String) As String
@@ -88,20 +88,26 @@ Public Class UyghurCharUtils
         Dim reg2 As New Regex("(\uFEFC)")
         Return reg2.Replace(reg1.Replace(source,
                            Function(word)
-                               Return ChrW(&HFEDF) & ChrW(&HFE8E)
+                               Return _ChrW(&HFEDF) & _ChrW(&HFE8E)
                            End Function),
                            Function(word)
-                               Return ChrW(&HFEE0) & ChrW(&HFE8E)
+                               Return _ChrW(&HFEE0) & _ChrW(&HFE8E)
                            End Function)
     End Function
     Private Function _GetCode(source As String, index As Integer) As Integer
         If source.Length = 0 Then Return 0
-        If index > 5 Then Return AscW(source)
+        If index > 5 Then Return _AscW(source)
         For i = 0 To 32
-            If AscW(source) = U(i, 0) Then
+            If _AscW(source) = U(i, 0) Then
                 Return U(i, index)
             End If
         Next
+        Return _AscW(source)
+    End Function
+    Private Function _AscW(source As String) As Integer
         Return AscW(source)
+    End Function
+    Private Function _ChrW(number As Integer) As String
+        Return ChrW(number)
     End Function
 End Class
