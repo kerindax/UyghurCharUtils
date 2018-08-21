@@ -165,15 +165,15 @@ public class UyghurCharUtils {
         return _AscW(source);
     }
 
-    public static int _AscW(char ch) {
+    private int _AscW(char ch) {
         return Integer.valueOf(ch);//.intValue();
     }
 
-    public static int _AscW(String source) {
+    private int _AscW(String source) {
         return _AscW(source.charAt(0));
     }
 
-    public static String _ChrW(int code) {
+    private String _ChrW(int code) {
         return String.valueOf((char) code);
     }
 }
