@@ -110,10 +110,10 @@ namespace Uyghur
             Regex reg2 = new Regex(@"(\uFEFC)");
             return reg2.Replace(reg1.Replace(source, word =>
             {
-                return _ChrW(0xFEDF) + _ChrW(0xFE8E);
+                return _ChrW(0x644) + _ChrW(0x627);
             }), word =>
             {
-                return _ChrW(0xFEE0) + _ChrW(0xFE8E);
+                return _ChrW(0x644) + _ChrW(0x627);
             });
         }
         private int _GetCode(string source, int index)
