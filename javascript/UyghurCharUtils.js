@@ -83,9 +83,9 @@ var UyghurCharUtils = window.UyghurCharUtils = class UyghurCharUtils {
   _BasicLa(source) {
     var that = this
     return source.replace(/(\uFEFB)/g, function (word) {
-      return that._ChrW(0xFEDF) + that._ChrW(0xFE8E);
+      return that._ChrW(0x644) + that._ChrW(0x627);
     }).replace(/(\uFEFC)/g, function (word) {
-      return that._ChrW(0xFEE0) + that._ChrW(0xFE8E);
+      return that._ChrW(0x644) + that._ChrW(0x627);
     });
   }
   _GetCode(source, index) {
