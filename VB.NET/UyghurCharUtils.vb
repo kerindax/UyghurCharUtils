@@ -86,15 +86,14 @@ Public Class UyghurCharUtils
         Return target
     End Function
 
-    Private Function _ReverseString(source As String) As String ' 反转
+    Private Function _ReverseString(source As String) As String
         Return StrReverse(source)
     End Function
 
     Private Function _ReverseAscii(source As String) As String
         Dim reg1 As New Regex("([^\uFB00-\uFEFF\s]+)")
         Return reg1.Replace(source, Function(word)
-                                        Dim str As String = word.Value.ToString()
-                                        Return _ReverseString(str)
+                                        Return _ReverseString(word.Value.ToString())
                                     End Function)
     End Function
 
