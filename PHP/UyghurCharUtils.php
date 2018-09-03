@@ -151,14 +151,4 @@
             return mb_convert_encoding('&#x'.dechex($number).';', 'UTF-8', 'HTML-ENTITIES');
         }
     }
-
-    $utils = new UyghurCharUtils();
-    $source = "سالام 123 دۇنيا!";
-    //$target1 = $utils->Basic2Extend($source);
-    $target1 = $utils->Basic2RExtend($source);
-	echo $target1."<br/>";
-	$target2 = $utils->RExtend2Basic($target1);
-
-    echo $target2."<br/>";
-
 ?> 
