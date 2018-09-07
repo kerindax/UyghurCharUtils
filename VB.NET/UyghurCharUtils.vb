@@ -1,143 +1,162 @@
-Imports System.Text.RegularExpressions
-Public Class UyghurCharUtils
-
-    Private U As Integer(,) = {{&H626, &HFE8B, &HFE8B, &HFE8C, &HFE8C, 1}, {&H627, &HFE8D, &HFE8D, &HFE8E, &HFE8E, 0}, {&H6D5, &HFEE9, &HFEE9, &HFEEA, &HFEEA, 0}, {&H628, &HFE8F, &HFE91, &HFE92, &HFE90, 1}, {&H67E, &HFB56, &HFB58, &HFB59, &HFB57, 1}, {&H62A, &HFE95, &HFE97, &HFE98, &HFE96, 1}, {&H62C, &HFE9D, &HFE9F, &HFEA0, &HFE9E, 1}, {&H686, &HFB7A, &HFB7C, &HFB7D, &HFB7B, 1}, {&H62E, &HFEA5, &HFEA7, &HFEA8, &HFEA6, 1}, {&H62F, &HFEA9, &HFEA9, &HFEAA, &HFEAA, 0}, {&H631, &HFEAD, &HFEAD, &HFEAE, &HFEAE, 0}, {&H632, &HFEAF, &HFEAF, &HFEB0, &HFEB0, 0}, {&H698, &HFB8A, &HFB8A, &HFB8B, &HFB8B, 0}, {&H633, &HFEB1, &HFEB3, &HFEB4, &HFEB2, 1}, {&H634, &HFEB5, &HFEB7, &HFEB8, &HFEB6, 1}, {&H63A, &HFECD, &HFECF, &HFED0, &HFECE, 1}, {&H641, &HFED1, &HFED3, &HFED4, &HFED2, 1}, {&H642, &HFED5, &HFED7, &HFED8, &HFED6, 1}, {&H643, &HFED9, &HFEDB, &HFEDC, &HFEDA, 1}, {&H6AF, &HFB92, &HFB94, &HFB95, &HFB93, 1}, {&H6AD, &HFBD3, &HFBD5, &HFBD6, &HFBD4, 1}, {&H644, &HFEDD, &HFEDF, &HFEE0, &HFEDE, 1}, {&H645, &HFEE1, &HFEE3, &HFEE4, &HFEE2, 1}, {&H646, &HFEE5, &HFEE7, &HFEE8, &HFEE6, 1}, {&H6BE, &HFBAA, &HFBAC, &HFBAD, &HFBAB, 1}, {&H648, &HFEED, &HFEED, &HFEEE, &HFEEE, 0}, {&H6C7, &HFBD7, &HFBD7, &HFBD8, &HFBD8, 0}, {&H6C6, &HFBD9, &HFBD9, &HFBDA, &HFBDA, 0}, {&H6C8, &HFBDB, &HFBDB, &HFBDC, &HFBDC, 0}, {&H6CB, &HFBDE, &HFBDE, &HFBDF, &HFBDF, 0}, {&H6D0, &HFBE4, &HFBE6, &HFBE7, &HFBE5, 1}, {&H649, &HFEEF, &HFBE8, &HFBE9, &HFEF0, 1}, {&H64A, &HFEF1, &HFEF3, &HFEF4, &HFEF2, 1}}
-    Private reg_str As String = "([\u0626-\u06d5]+)"
-
-    Public Sub New()
-    End Sub
-
-    ''' <summary>
-    ''' 基本区   转换   扩展区
-    ''' </summary>
-    ''' <param name="source">要转换的内容</param>
-    ''' <returns>已转换的内容</returns>
-    Public Function Basic2Extend(source As String) As String
-        Dim reg1 As New Regex(reg_str)
-        Return reg1.Replace(source,
-            Function(word)
-                Dim str = word.Value
-                Dim returns As String = ""
-                Dim target As String = ""
-                Dim target2 As String = ""
-                Dim ch As Integer
-                Dim p As Integer
-                Dim length As Integer = str.Length
-                If length > 1 Then
-                    target = str.Substring(0, 1)
-                    ch = _GetCode(target, 2)
-                    returns &= _ChrW(ch)
-                    For i = 0 To length - 3
-                        target = str.Substring(i, 1)
-                        target2 = str.Substring(i + 1, 1)
-                        p = _GetCode(target, 5)
-                        ch = _GetCode(target2, 2 + p)
-                        returns &= _ChrW(ch)
-                    Next
-                    target = str.Substring(length - 2, 1)
-                    target2 = str.Substring(length - 1, 1)
-                    p = _GetCode(target, 5) * 3
-                    ch = _GetCode(target2, 1 + p)
-                    returns &= _ChrW(ch)
-                Else
-                    ch = _GetCode(str, 1)
-                    returns &= _ChrW(ch)
-                End If
-                Return _ExtendLa(returns.Trim())
-            End Function)
-    End Function
-
-    ''' <summary>
-    ''' 基本区  转换   反向扩展区
-    ''' </summary>
-    ''' <param name="source">要转换的内容</param>
-    ''' <returns>已转换的内容</returns>
-    Public Function Basic2RExtend(source As String) As String
-        Dim ThisText = Basic2Extend(source)
-        Dim ReverseString = _ReverseString(ThisText)
-        Return _ReverseAscii(ReverseString)
-    End Function
-
-    ''' <summary>
-    ''' 扩展区   转换   基本区
-    ''' </summary>
-    ''' <param name="source">要转换的内容</param>
-    ''' <returns>已转换的内容</returns>
-    Public Function Extend2Basic(source As String) As String
-        Dim i, ch
-        Dim target = ""
-        source = _BasicLa(source)
-        For i = 0 To source.Length - 1
-            ch = source.Substring(i, 1)
-            target += _ChrW(_GetCode(ch, 0))
-        Next
-        Return target
-    End Function
-
-    ''' <summary>
-    ''' 反向扩展区   转换   基本区
-    ''' </summary>
-    ''' <param name="source">要转换的内容</param>
-    ''' <returns>已转换的内容</returns>
-    Public Function RExtend2Basic(source As String) As String
-        Dim target = _ReverseAscii(source)
-        target = _ReverseString(target)
-        target = Extend2Basic(target)
-        Return target
-    End Function
-
-    Private Function _ReverseString(source As String) As String
-        Return StrReverse(source)
-    End Function
-
-    Private Function _ReverseAscii(source As String) As String
-        Dim reg1 As New Regex("([^\uFB00-\uFEFF\s]+)")
-        Return reg1.Replace(source, Function(word)
-                                        Return _ReverseString(word.Value.ToString())
-                                    End Function)
-    End Function
-
-    Private Function _ExtendLa(source As String) As String
-        Dim reg1 As New Regex("(\uFEDF\uFE8E)")
-        Dim reg2 As New Regex("(\uFEE0\uFE8E)")
-        Return reg2.Replace(reg1.Replace(source,
-                           Function(word)
-                               Return _ChrW(&HFEFB)
-                           End Function),
-                           Function(word)
-                               Return _ChrW(&HFEFC)
-                           End Function)
-    End Function
-
-    Private Function _BasicLa(source As String) As String
-        Dim reg1 As New Regex("(\uFEFB)")
-        Dim reg2 As New Regex("(\uFEFC)")
-        Return reg2.Replace(reg1.Replace(source,
-                           Function(word)
-                               Return _ChrW(&H644) & _ChrW(&H627)
-                           End Function),
-                           Function(word)
-                               Return _ChrW(&H644) & _ChrW(&H627)
-                           End Function)
-    End Function
-
-    Private Function _GetCode(source As String, index As Integer) As Integer
-        If source.Length = 0 Then Return 0
-        If index > 5 Then Return _AscW(source)
-        For i = 0 To 32
-            Dim code As Integer = _AscW(source)
-            If code = U(i, 0) OrElse code = U(i, 1) OrElse code = U(i, 2) OrElse code = U(i, 3) OrElse code = U(i, 4) Then
-                Return U(i, index)
-            End If
-        Next
-        Return _AscW(source)
-    End Function
-
-    Private Function _AscW(source As String) As Integer
-        Return AscW(source)
-    End Function
-
-    Private Function _ChrW(number As Integer) As String
-        Return ChrW(number)
-    End Function
-End Class
+using System;
+using System.Text.RegularExpressions;
+namespace Uyghur
+{
+    public class CharUtils
+    {
+        public int[,] U = { { 0x626, 0xFE8B, 0xFE8B, 0xFE8C, 0xFE8C, 1 }, { 0x627, 0xFE8D, 0xFE8D, 0xFE8E, 0xFE8E, 0 }, { 0x6D5, 0xFEE9, 0xFEE9, 0xFEEA, 0xFEEA, 0 }, { 0x628, 0xFE8F, 0xFE91, 0xFE92, 0xFE90, 1 }, { 0x67E, 0xFB56, 0xFB58, 0xFB59, 0xFB57, 1 }, { 0x62A, 0xFE95, 0xFE97, 0xFE98, 0xFE96, 1 }, { 0x62C, 0xFE9D, 0xFE9F, 0xFEA0, 0xFE9E, 1 }, { 0x686, 0xFB7A, 0xFB7C, 0xFB7D, 0xFB7B, 1 }, { 0x62E, 0xFEA5, 0xFEA7, 0xFEA8, 0xFEA6, 1 }, { 0x62F, 0xFEA9, 0xFEA9, 0xFEAA, 0xFEAA, 0 }, { 0x631, 0xFEAD, 0xFEAD, 0xFEAE, 0xFEAE, 0 }, { 0x632, 0xFEAF, 0xFEAF, 0xFEB0, 0xFEB0, 0 }, { 0x698, 0xFB8A, 0xFB8A, 0xFB8B, 0xFB8B, 0 }, { 0x633, 0xFEB1, 0xFEB3, 0xFEB4, 0xFEB2, 1 }, { 0x634, 0xFEB5, 0xFEB7, 0xFEB8, 0xFEB6, 1 }, { 0x63A, 0xFECD, 0xFECF, 0xFED0, 0xFECE, 1 }, { 0x641, 0xFED1, 0xFED3, 0xFED4, 0xFED2, 1 }, { 0x642, 0xFED5, 0xFED7, 0xFED8, 0xFED6, 1 }, { 0x643, 0xFED9, 0xFEDB, 0xFEDC, 0xFEDA, 1 }, { 0x6AF, 0xFB92, 0xFB94, 0xFB95, 0xFB93, 1 }, { 0x6AD, 0xFBD3, 0xFBD5, 0xFBD6, 0xFBD4, 1 }, { 0x644, 0xFEDD, 0xFEDF, 0xFEE0, 0xFEDE, 1 }, { 0x645, 0xFEE1, 0xFEE3, 0xFEE4, 0xFEE2, 1 }, { 0x646, 0xFEE5, 0xFEE7, 0xFEE8, 0xFEE6, 1 }, { 0x6BE, 0xFBAA, 0xFBAC, 0xFBAD, 0xFBAB, 1 }, { 0x648, 0xFEED, 0xFEED, 0xFEEE, 0xFEEE, 0 }, { 0x6C7, 0xFBD7, 0xFBD7, 0xFBD8, 0xFBD8, 0 }, { 0x6C6, 0xFBD9, 0xFBD9, 0xFBDA, 0xFBDA, 0 }, { 0x6C8, 0xFBDB, 0xFBDB, 0xFBDC, 0xFBDC, 0 }, { 0x6CB, 0xFBDE, 0xFBDE, 0xFBDF, 0xFBDF, 0 }, { 0x6D0, 0xFBE4, 0xFBE6, 0xFBE7, 0xFBE5, 1 }, { 0x649, 0xFEEF, 0xFBE8, 0xFBE9, 0xFEF0, 1 }, { 0x64A, 0xFEF1, 0xFEF3, 0xFEF4, 0xFEF2, 1 } };
+        private string reg_str = "([\u0626-\u06d5]+)";
+        public CharUtils()
+        {
+        }
+        /// <summary>
+        /// 基本区   转换   扩展区
+        /// </summary>
+        /// <param name="source">要转换的内容</param>
+        /// <returns>已转换的内容</returns>
+        public string Basic2Extend(string source)
+        {
+            Regex reg1 = new Regex(reg_str);
+            return reg1.Replace(source, word => {
+                var str = word.Value;
+                string returns = "";
+                string target = "";
+                string target2 = "";
+                int ch;
+                int p;
+                int length = str.Length;
+                if (length > 1)
+                {
+                    target = str.Substring(0, 1);
+                    ch = _GetCode(target, 2);
+                    returns += _ChrW(ch);
+                    for (var i = 0; i <= length - 3; i++)
+                    {
+                        target = str.Substring(i, 1);
+                        target2 = str.Substring(i + 1, 1);
+                        p = _GetCode(target, 5);
+                        ch = _GetCode(target2, 2 + p);
+                        returns += _ChrW(ch);
+                    }
+                    target = str.Substring(length - 2, 1);
+                    target2 = str.Substring(length - 1, 1);
+                    p = _GetCode(target, 5) * 3;
+                    ch = _GetCode(target2, 1 + p);
+                    returns += _ChrW(ch);
+                }
+                else
+                {
+                    ch = _GetCode(str, 1);
+                    returns += _ChrW(ch);
+                }
+                return _ExtendLa(returns.Trim());
+            });
+        }
+        /// <summary>
+        ///  基本区  转换   反向扩展区
+        /// </summary>
+        /// <param name="source">要转换的内容</param>
+        /// <returns>已转换的内容</returns>
+        public string Basic2RExtend(string source)
+        {
+            var ThisText = Basic2Extend(source);
+            var ReverseString = _ReverseString(ThisText);
+            return _ReverseAscii(ReverseString);
+        }
+        /// <summary>
+        /// 扩展区   转换   基本区
+        /// </summary>
+        /// <param name="source">要转换的内容</param>
+        /// <returns>已转换的内容</returns>
+        public string Extend2Basic(string source)
+        {
+            int i;
+            string ch;
+            var target = "";
+            source = _BasicLa(source);
+            for (i = 0; i <= source.Length - 1; i++)
+            {
+                ch = source.Substring(i, 1);
+                target += _ChrW(_GetCode(ch, 0));
+            }
+            return target;
+        }
+        /// <summary>
+        /// 反向扩展区   转换   基本区
+        /// </summary>
+        /// <param name="source">要转换的内容</param>
+        /// <returns>已转换的内容</returns>
+        public string RExtend2Basic(string source)
+        {
+            var target = _ReverseAscii(source);
+            target = _ReverseString(target);
+            target = Extend2Basic(target);
+            return target;
+        }
+        private string _ReverseAscii(string source)
+        {
+            Regex reg1 = new Regex(@"([^\uFB00-\uFEFF\s]+)");
+            return reg1.Replace(source, word =>
+            {
+                return _ReverseString(word.Value.ToString());
+            });
+        }
+        private string _ReverseString(string source)
+        {
+            string reverse = string.Empty;
+            for (int i = source.Length - 1; i >= 0; i--)
+            {
+                reverse += source[i];
+            }
+            return reverse;
+        }
+        private string _ExtendLa(string source)
+        {
+            Regex reg1 = new Regex(@"(\uFEDF\uFE8E)");
+            Regex reg2 = new Regex(@"(\uFEDF\uFE8E)");
+            return reg2.Replace(reg1.Replace(source, word => {
+                return _ChrW(0xFEFB);
+            }), word => {
+                return _ChrW(0xFEF);
+            });
+        }
+        private string _BasicLa(string source)
+        {
+            Regex reg1 = new Regex(@"(\uFEFB)");
+            Regex reg2 = new Regex(@"(\uFEFC)");
+            return reg2.Replace(reg1.Replace(source, word =>
+            {
+                return _ChrW(0x644) + _ChrW(0x627);
+            }), word =>
+            {
+                return _ChrW(0x644) + _ChrW(0x627);
+            });
+        }
+        private int _GetCode(string source, int index)
+        {
+            if (source.Length == 0)
+                return 0;
+            if (index > 5)
+                return _AscW(source);
+            for (var i = 0; i <= 32; i++)
+            {
+                int code = _AscW(source);
+                if (code == U[i, 0]|| code == U[i, 1]|| code == U[i, 2]|| code == U[i, 3]|| code == U[i, 4])
+                    return U[i, index];
+            }
+            return _AscW(source);
+        }
+        private int _AscW(char ch)
+        {
+            return Convert.ToChar(ch);
+        }
+        private int _AscW(string source)
+        {
+            return _AscW(source[0]);
+        }
+        private string _ChrW(int number)
+        {
+            return Convert.ToChar(number).ToString();
+        }
+    }
+}
