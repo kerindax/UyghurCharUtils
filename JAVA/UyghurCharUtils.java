@@ -4,7 +4,7 @@ import java.util.regex.Pattern;
 /**
  *
  * @author Sherer
- * @update 2018-09-07 11:28
+ * @update 2018-09-07 11:29
  */
 public class UyghurCharUtils {
 
