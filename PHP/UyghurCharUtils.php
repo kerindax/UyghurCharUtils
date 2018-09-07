@@ -121,7 +121,8 @@
             if(strlen($source)==0) return 0;
             if($index>5) return $this->_AscW($source);
             for($i=0;$i<33;$i++){
-                if($this->_AscW($source) == $this->U[$i][0]){
+                $code = $this->_AscW($source);
+                if($code == $this->U[$i][0] || $code == $this->U[$i][1] || $code == $this->U[$i][2] || $code == $this->U[$i][3] || $code == $this->U[$i][4]){
                     return $this->U[$i][$index];
                 }
             }
