@@ -124,7 +124,8 @@ namespace Uyghur
                 return _AscW(source);
             for (var i = 0; i <= 32; i++)
             {
-                if (_AscW(source) == U[i, 0])
+                int code = _AscW(source);
+                if (code == U[i, 0] || code == U[i, 1] || code == U[i, 2] || code == U[i, 3] || code == U[i, 4])
                     return U[i, index];
             }
             return _AscW(source);

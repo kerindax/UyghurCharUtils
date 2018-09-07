@@ -125,7 +125,8 @@ Public Class UyghurCharUtils
         If source.Length = 0 Then Return 0
         If index > 5 Then Return _AscW(source)
         For i = 0 To 32
-            If _AscW(source) = U(i, 0) Then
+            Dim code As Integer = _AscW(source)
+            If code = U(i, 0) OrElse code = U(i, 1) OrElse code = U(i, 2) OrElse code = U(i, 3) OrElse code = U(i, 4) Then
                 Return U(i, index)
             End If
         Next
