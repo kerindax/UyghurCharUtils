@@ -9,7 +9,11 @@ namespace Uyghur
         public CharUtils()
         {
         }
-        /** 基本区   转换   扩展区*/
+        /// <summary>
+        /// 基本区   转换   扩展区
+        /// </summary>
+        /// <param name="source">要转换的内容</param>
+        /// <returns>已转换的内容</returns>
         public string Basic2Extend(string source)
         {
             Regex reg1 = new Regex(reg_str);
@@ -48,14 +52,22 @@ namespace Uyghur
                 return _ExtendLa(returns.Trim());
             });
         }
-        /**基本区  转换   反向扩展区*/
+        /// <summary>
+        ///  基本区  转换   反向扩展区
+        /// </summary>
+        /// <param name="source">要转换的内容</param>
+        /// <returns>已转换的内容</returns>
         public string Basic2RExtend(string source)
         {
             var ThisText = Basic2Extend(source);
             var ReverseString = _ReverseString(ThisText);
             return _ReverseAscii(ReverseString);
         }
-        /**扩展区   转换   基本区 */
+        /// <summary>
+        /// 扩展区   转换   基本区
+        /// </summary>
+        /// <param name="source">要转换的内容</param>
+        /// <returns>已转换的内容</returns>
         public string Extend2Basic(string source)
         {
             int i;
@@ -69,7 +81,11 @@ namespace Uyghur
             }
             return target;
         }
-        /**反向扩展区   转换   基本区 */
+        /// <summary>
+        /// 反向扩展区   转换   基本区
+        /// </summary>
+        /// <param name="source">要转换的内容</param>
+        /// <returns>已转换的内容</returns>
         public string RExtend2Basic(string source)
         {
             var target = _ReverseAscii(source);
@@ -86,7 +102,7 @@ namespace Uyghur
             });
         }
         private string _ReverseString(string source)
-        {// 反转
+        {
             string reverse = string.Empty;
             for (int i = source.Length - 1; i >= 0; i--)
             {
@@ -125,7 +141,7 @@ namespace Uyghur
             for (var i = 0; i <= 32; i++)
             {
                 int code = _AscW(source);
-                if (code == U[i, 0] || code == U[i, 1] || code == U[i, 2] || code == U[i, 3] || code == U[i, 4])
+                if (code == U[i, 0]|| code == U[i, 1]|| code == U[i, 2]|| code == U[i, 3]|| code == U[i, 4])
                     return U[i, index];
             }
             return _AscW(source);
