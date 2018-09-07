@@ -50,7 +50,7 @@ var UyghurCharUtils = window.UyghurCharUtils = class UyghurCharUtils {
     source = this._BasicLa(source);
     for (i = 0; i < source.length; i++) {
       ch = source.substr(i, 1);
-      target += this._GetChar(ch, 0);
+      target += this._ChrW(this._GetCode(ch, 0));
     }
     return target;
   }
@@ -103,6 +103,6 @@ var UyghurCharUtils = window.UyghurCharUtils = class UyghurCharUtils {
     return source.charCodeAt();
   }
   _ChrW(number) {
-    return String.fromCharCode(number) ;
+    return String.fromCharCode(number);
   }
 }
