@@ -3,7 +3,11 @@ let reg_str = /[\u0626-\u06d5]+/g;
 var UyghurCharUtils = window.UyghurCharUtils = class UyghurCharUtils {
   constructor() {
   }
-  /**基本区   转换   扩展区*/
+  /**
+   * 基本区   转换   扩展区
+   * @param source 要转换的内容
+   * @return 已转换的内容
+   */
   Basic2Extend(source) {
     var that = this
     return source.replace(reg_str, function (word) {
@@ -37,13 +41,21 @@ var UyghurCharUtils = window.UyghurCharUtils = class UyghurCharUtils {
       return that._ExtendLa(returns.trim());
     });
   }
-  /**基本区  转换   反向扩展区*/
+  /**
+   * 基本区  转换   反向扩展区
+   * @param source 要转换的内容
+   * @return 已转换的内容
+   */
   Basic2RExtend(source) {
     var ThisText = this.Basic2Extend(source);
     var ReverseString = this._ReverseString(ThisText);
     return this._ReverseAscii(ReverseString);
   }
-  /**扩展区   转换   基本区 */
+  /**
+   * 扩展区   转换   基本区
+   * @param source 要转换的内容
+   * @return 已转换的内容
+   */
   Extend2Basic(source) {
     var i, j, ch;
     var target = '';
@@ -54,7 +66,11 @@ var UyghurCharUtils = window.UyghurCharUtils = class UyghurCharUtils {
     }
     return target;
   }
-  /**反向扩展区   转换   基本区 */
+  /**
+   * 反向扩展区   转换   基本区
+   * @param source 要转换的内容
+   * @return 已转换的内容
+   */
   RExtend2Basic(source) {
     var target = this._ReverseAscii(source);
     target = this._ReverseString(target);
