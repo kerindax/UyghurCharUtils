@@ -94,7 +94,8 @@ var UyghurCharUtils = window.UyghurCharUtils = class UyghurCharUtils {
     if (index > 5)
       return this._AscW(source);
     for (var i = 0; i <= 32; i++) {
-      if (this._AscW(source) == U[i][0])
+      var code = this._AscW(source)
+      if (code == U[i][0]||code == U[i][1]||code == U[i][2]||code == U[i][3]||code == U[i][4])
         return U[i][index];
     }
     return this._AscW(source);
