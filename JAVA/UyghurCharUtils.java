@@ -1,15 +1,10 @@
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 /**
  *
  * @author Sherer
+ * @update 2018-09-07 11:28
  */
 public class UyghurCharUtils {
 
@@ -144,7 +139,8 @@ public class UyghurCharUtils {
             return _AscW(source);
         }
         for (int i = 0; i < 33; i++) {
-            if (_AscW(source) == U[i][0]) {
+            int code = _AscW(source);
+            if (code == U[i][0] || code == U[i][1] || code == U[i][2] || code == U[i][3] || code == U[i][4]) {
                 return U[i][index];
             }
         }
@@ -161,19 +157,5 @@ public class UyghurCharUtils {
 
     public static String _ChrW(int number) {
         return String.valueOf((char) number);
-    }
-    
-    
-    public static void main(String[] args) {
-        UyghurCharUtils utils = new UyghurCharUtils();
-        
-        String source = "سالام 123 دۇنيا!";
-        String target1 = utils.Basic2Extend(source);
-        String target2 = utils.Basic2RExtend(source);
-        
-        System.out.println(target1);
-        System.out.println(target2);
-        System.out.println(utils.Extend2Basic(target1));
-        System.out.println(utils.RExtend2Basic(target2));
     }
 }
