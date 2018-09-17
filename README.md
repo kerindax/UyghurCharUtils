@@ -1,4 +1,4 @@
-# UyghurCharUtils
+# Uyghur Char Utils
 
 #### 项目介绍
 维吾尔语基本区和扩展区转换函数类库
