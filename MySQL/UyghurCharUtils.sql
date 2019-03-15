@@ -66,10 +66,10 @@ END;
 
 CREATE DEFINER=`root`@`localhost` FUNCTION `_ChrW`(`number` INT) RETURNS char(1) CHARSET utf8
 BEGIN
-	RETURN CONVERT( unhex(hex(number)) USING utf8);
+	RETURN CONVERT( unhex(hex(number)) USING ucs2);
 END;
 
 CREATE DEFINER=`root`@`localhost` FUNCTION `_AscW`(`source` CHAR(1) CHARSET utf8) RETURNS int(11)
 BEGIN
-	RETURN ORD(CONVERT( source USING utf8 ));
+	RETURN ORD(CONVERT( source USING ucs2 ));
 END;
