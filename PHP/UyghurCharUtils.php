@@ -98,7 +98,7 @@
         private function _ExtendLa($source){
             return preg_replace_callback("/(\x{FEE0}\x{FE8E})/u",
             function($word){
-                return $this->_ChrW(0x644) . $this->_ChrW(0xFEFC);
+                return $this->_ChrW(0xFEFC);
             },
             preg_replace_callback("/(\x{FEDF}\x{FE8E})/u",
             function($word){
