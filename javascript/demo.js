@@ -1,7 +1,12 @@
+    // +----------------------------------------------------------------------
+    // | Update: 2020-01-17 13:54
+    // +----------------------------------------------------------------------
+    // | Author: Kerindax <1482152356@qq.com>
+    // +----------------------------------------------------------------------
     require("UyghurCharUtils.js");
     var utils  = new UyghurCharUtils();
     var source = "سالام JS";
-    
+
     var target1 = utils.Basic2Extend(source);//基本区 转换 扩展区
     var target2 = utils.Extend2Basic(target1);//扩展区 转换 基本区
 
