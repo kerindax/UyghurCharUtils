@@ -9,3 +9,6 @@
 2. Extend2Basic(source){}       扩展区 转换 基本区
 3. Basic2RExtend(source){}      基本区 转换 反向扩展区
 4. RExtend2Basic(source){}      反向扩展区 转换 基本区
+
+#### npm安装
+`npm install uyghur-char-utils`
