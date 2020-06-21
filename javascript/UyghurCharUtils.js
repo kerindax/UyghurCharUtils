@@ -3,53 +3,44 @@
 // +----------------------------------------------------------------------
 // | Author: Kerindax <1482152356@qq.com>
 // +----------------------------------------------------------------------
+const BASIC = 0; //基本区形式  A
+const ALONE = 1; //单独形式    A
+const HEAD  = 2; //头部形式    A_
+const CENTR = 3; //中部形式   _A_
+const REAR  = 4; //后部形式   _A
 
+const convertRang = /[\u0622-\u064a\u0675-\u06d5]+/g; //转换范围；不包含哈语的0x0621字母,问号,双引号和Unicode区域的符号
+const suffixRang = /[^\u0627\u062F-\u0632\u0648\u0688-\u0699\u06C0-\u06CB\u06D5]/g; //分割范围，有后尾的字符表达式
+const extendRang = /[\ufb50-\ufdff\ufe70-\ufeff]/g; //扩展区范围；FB50-FDFF ->区域A    FE70-FEFF -> 区域B
+const notExtendRang = /[^\ufb50-\ufdff\ufe70-\ufeff\s]+(\s[^\ufb50-\ufdff\ufe70-\ufeff\s]+)*/g; //不包含扩展区中部包含空格字符集；FB50-FDFF ->区域A    FE70-FEFF -> 区域B
 
-// const BASIC = 0; //基本区形式  A
-// const ALONE = 1; //单独形式    A
-// const HEAD = 2; //头部形式    A_
-// const CENTR = 3; //中部形式   _A_
-// const REAR = 4; //后部形式   _A
-
+//特助转换区，扩展区反向转换的时候需要替换
+const symbolRang = /[\)\(\]\[\}\{\>\<\»\«]/g;
+const symbolList = {
+  ')': '(',
+  '(': ')',
+  ']': '[',
+  '[': ']',
+  '}': '{',
+  '{': '}',
+  '>': '<',
+  '<': '>',
+  '»': '«',
+  '«': '»',
+};
+/**
+ * 维吾尔语总共有32字母，零号数组元素对应的是特助字符，最后加了哈萨克语和柯尔克孜语的四个字母
+ * 
+ * 基本码：[单独形式, 头部形式, 中部形式, 后部形式]
+ *   A  :  [   A   ,    A_   ,   _A_  ,   _A   ]
+ * 
+ */
 class UyghurCharUtils {
-  BASIC = 0; //基本区形式  A
-  ALONE = 1; //单独形式    A
-  HEAD = 2; //头部形式    A_
-  CENTR = 3; //中部形式   _A_
-  REAR = 4; //后部形式   _A
-
   // 单字母列表
   charCode = {};
   // 双目字列表，转换扩展区的时候需要替换
   special = [];
-
-  convertRang = /[\u0622-\u064a\u0675-\u06d5]+/g; //转换范围；不包含哈语的0x0621字母,问号,双引号和Unicode区域的符号
-  suffixRang = /[^\u0627\u062F-\u0632\u0648\u0688-\u0699\u06C0-\u06CB\u06D5]/g; //分割范围，有后尾的字符表达式
-  extendRang = /[\ufb50-\ufdff\ufe70-\ufeff]/g; //扩展区范围；FB50-FDFF ->区域A    FE70-FEFF -> 区域B
-  notExtendRang = /[^\ufb50-\ufdff\ufe70-\ufeff\s]+(\s[^\ufb50-\ufdff\ufe70-\ufeff\s]+)*/g //不包含扩展区中部包含空格字符集；FB50-FDFF ->区域A    FE70-FEFF -> 区域B
-
-  //特助转换区，扩展区反向转换的时候需要替换
-  symbolRang = /[\)\(\]\[\}\{\>\<\»\«]/g;
-  symbolList = {
-    ')': '(',
-    '(': ')',
-    ']': '[',
-    '[': ']',
-    '}': '{',
-    '{': '}',
-    '>': '<',
-    '<': '>',
-    '»': '«',
-    '«': '»',
-  };
   constructor() {
-    /**
-     * 维吾尔语总共有32字母，零号数组元素对应的是特助字符，最后加了哈萨克语和柯尔克孜语的四个字母
-     * 
-     * 基本码：[单独形式, 头部形式, 中部形式, 后部形式]
-     *   A  :  [   A   ,    A_   ,   _A_  ,   _A   ]
-     * 
-     */
     [
       [0x626, 0xfe8b, 0xfe8b, 0xfe8c, 0xfe8c], // 1 --- 00-Hemze
       [0x627, 0xfe8d, 0xfe8d, 0xfe8e, 0xfe8e], // 0 --- 01-a   
@@ -100,45 +91,45 @@ class UyghurCharUtils {
       return row
     });
 
-  }
+  };
   /**
    * 基本区->转换->扩展区
    * @param source 要转换的内容，可以包含混合字符串
    * @return 已转换的内容
    */
   Basic2Extend(source) {
-    return source.replace(this.convertRang, word => {
+    return source.replace(convertRang, word => {
       let returns = word
-        .replace(this.suffixRang, ch => {
+        .replace(suffixRang, ch => {
           return ch + '  ';
         })
         .trim()
         .replace(/^(\S)$/, (ch, $1) => {//单字母
-          return this.getChar($1, this.ALONE);
+          return this.getChar($1, ALONE);
         })
         .replace(/^(\S)(\S)/g, (ch, $1, $2) => {//首字母-没有尾
-          return this.getChar($1, this.ALONE) + $2;
+          return this.getChar($1, ALONE) + $2;
         })
         .replace(/(\S)(\S)$/, (ch, $1, $2) => {//最后字母-没有尾
-          return $1 + this.getChar($2, this.ALONE);
+          return $1 + this.getChar($2, ALONE);
         })
         .replace(/(\S)(\S)(\S)/g, (ch, $1, $2, $3) => {//中部字母-没有尾
-          return $1 + this.getChar($2, this.ALONE) + $3;
+          return $1 + this.getChar($2, ALONE) + $3;
         })
         .replace(/^(\S)\s/g, (ch, $1) => {//首字母-后部有尾
-          return this.getChar($1, this.HEAD);
+          return this.getChar($1, HEAD);
         })
         .replace(/(\S)(\S)\s/g, (ch, $1, $2) => {//中部字母-后部有尾
-          return $1 + this.getChar($2, this.HEAD);
+          return $1 + this.getChar($2, HEAD);
         })
         .replace(/\s(\S)\s/g, (ch, $1) => {//中部字母-前后有尾
-          return this.getChar($1, this.CENTR);
+          return this.getChar($1, CENTR);
         })
         .replace(/\s(\S)$/, (ch, $1) => {//最后字母-前部有尾
-          return this.getChar($1, this.REAR);
+          return this.getChar($1, REAR);
         })
         .replace(/\s(\S)(\S)/g, (ch, $1, $2) => {//中部字母-前部有尾
-          return this.getChar($1, this.REAR) + $2;
+          return this.getChar($1, REAR) + $2;
         });
       return this.extendLa(returns);
     });
@@ -150,7 +141,7 @@ class UyghurCharUtils {
    */
   Extend2Basic(source) {
     //扩展区范围；FB50-FDFF ->区域A    FE70-FEFF -> 区域B
-    return this.basicLa(source).replace(this.extendRang, ch => this.getChar(ch, this.BASIC))
+    return this.basicLa(source).replace(extendRang, ch => this.getChar(ch, BASIC));
   };
   /**
    * 基本区  转换   反向扩展区
@@ -169,10 +160,10 @@ class UyghurCharUtils {
     return this.Extend2Basic(this.reverseSubject(this.reverseAscii(source)));
   };
   reverseAscii(source) {
-    return source.replace(this.notExtendRang, (word) => {
+    return source.replace(notExtendRang, (word) => {
       return word.split("").reverse().join("")
-        .replace(this.symbolRang, ch => {//替换符号
-          return this.symbolList[ch] || ch;
+        .replace(symbolRang, ch => {//替换符号
+          return symbolList[ch] || ch;
         });
     });
   };
