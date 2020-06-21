@@ -5,7 +5,7 @@
 // +----------------------------------------------------------------------
 
 /**
- * 维吾尔语总共有32字母，零号数组元素对应的是特助字符，最后加了哈萨语言和柯尔克孜语言的四个字母
+ * 维吾尔语总共有32字母，零号数组元素对应的是特助字符，最后加了哈萨克语和柯尔克孜语的四个字母
  * 
  * 基本码：[单独形式, 头部形式, 中部形式, 后部形式]
  *   A  :  [   A   ,    A_   ,   _A_  ,   _A   ]
@@ -136,20 +136,20 @@ class UyghurCharUtils {
     });
   };
   /**
-   * 基本区  转换   反向扩展区
-   * @param source 要转换的内容
-   * @return 已转换的内容
-   */
-  Basic2RExtend(source) {
-    return this.reverseAscii(this.reverseSubject(this.Basic2Extend(source)));
-  };
-  /**
    * 扩展区   转换   基本区
    * @param source 要转换的内容
    * @return 已转换的内容
    */
   Extend2Basic(source) {
     return this.basicLa(source).replace(new RegExp('[' + extendRang + ']', 'g'), ch => this.getChar(ch, BASIC))
+  };
+  /**
+   * 基本区  转换   反向扩展区
+   * @param source 要转换的内容
+   * @return 已转换的内容
+   */
+  Basic2RExtend(source) {
+    return this.reverseAscii(this.reverseSubject(this.Basic2Extend(source)));
   };
   /**
    * 反顺序扩展区   转换   基本区
