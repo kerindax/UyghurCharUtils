@@ -1,9 +1,10 @@
     // +----------------------------------------------------------------------
-    // | Update: 2020-01-17 13:54
+    // | Update: 2020-06-21 00:00
     // +----------------------------------------------------------------------
     // | Author: Kerindax <1482152356@qq.com>
     // +----------------------------------------------------------------------
-    require("UyghurCharUtils.js");
+    import UyghurCharUtils from 'UyghurCharUtils'
+    // require("UyghurCharUtils.js");
     var utils  = new UyghurCharUtils();
     var source = "سالام JS";
 
