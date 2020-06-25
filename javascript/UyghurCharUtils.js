@@ -28,12 +28,11 @@ const symbolList = {
   '»': '«',
   '«': '»',
 };
+
+const {fromCharCode} = String;
+
 /**
  * 维吾尔语总共有32字母，零号数组元素对应的是特助字符，最后加了哈萨克语和柯尔克孜语的四个字母
- * 
- * 基本码：[单独形式, 头部形式, 中部形式, 后部形式]
- *   A  :  [   A   ,    A_   ,   _A_  ,   _A   ]
- * 
  */
 class UyghurCharUtils {
   // 单字母列表
@@ -41,6 +40,10 @@ class UyghurCharUtils {
   // 双目字列表，转换扩展区的时候需要替换
   special = [];
   constructor() {
+    /**
+      * 基本码, 单独形式, 头部形式, 中部形式, 后部形式]
+      * [  A  ,     A   ,    A_   ,   _A_  ,   _A   ]
+     */
     [
       [0x626, 0xfe8b, 0xfe8b, 0xfe8c, 0xfe8c], // 1 --- 00-Hemze
       [0x627, 0xfe8d, 0xfe8d, 0xfe8e, 0xfe8e], // 0 --- 01-a   
@@ -80,14 +83,14 @@ class UyghurCharUtils {
       [0x6c9, 0xfbe2, 0xfbe2, 0xfbe3, 0xfbe3], // 0 --- kz o^
       [0x62d, 0xfea1, 0xfea3, 0xfea4, 0xfea2], // 1 --- kz h
       [0x639, 0xfec9, 0xfecb, 0xfecc, 0xfeca], // 1 --- kz c
-    ].forEach(row => row.map(item => String.fromCharCode(item)).forEach((item, index, list) => this.charCode[item] = list));
+    ].forEach(row => row.map(item => fromCharCode(item)).forEach((item, index, list) => this.charCode[item] = list));
 
     // 双目字列表，转换扩展区的时候需要替换
     this.special = [
       { basic: [0x644, 0x627], extend: [0xfefc], link: [0xfee0, 0xfe8e], },// LA
       { basic: [0x644, 0x627], extend: [0xfefb], link: [0xfedf, 0xfe8e], },//_LA
     ].map(row => {
-      for (let key in row) row[key] = row[key].map(el => String.fromCharCode(el)).join('')
+      for (let key in row) row[key] = row[key].map(el => fromCharCode(el)).join('')
       return row
     });
 
@@ -140,7 +143,6 @@ class UyghurCharUtils {
    * @return 已转换的内容
    */
   Extend2Basic(source) {
-    //扩展区范围；FB50-FDFF ->区域A    FE70-FEFF -> 区域B
     return this.basicLa(source).replace(extendRang, ch => this.getChar(ch, BASIC));
   };
   /**
