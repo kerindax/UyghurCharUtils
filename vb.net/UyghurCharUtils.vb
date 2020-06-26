@@ -15,10 +15,10 @@ Namespace Uyghur
         Private Const CENTR As Integer = 3 '中部形式   _A_
         Private Const REAR As Integer = 4 '后部形式    _A
 
-        Private Const convertRang As String = "[\u0622-\u064a\u0675-\u06d5]+"
-        Private Const suffixRang As String = "[^\u0627\u062F-\u0632\u0648\u0688-\u0699\u06C0-\u06CB\u06D5]"
-        Private Const extendRang As String = "[\ufb50-\ufdff\ufe70-\ufeff]"
-        Private Const notExtendRang As String = "[^\ufb50-\ufdff\ufe70-\ufeff\s]+(\s[^\ufb50-\ufdff\ufe70-\ufeff\s]+)*"
+        Private Const convertRang As String = "[\u0622-\u064a\u0675-\u06d5]+" '转换范围；不包含哈语的0x0621字母,问号,双引号和Unicode区域的符号
+        Private Const suffixRang As String = "[^\u0627\u062F-\u0632\u0648\u0688-\u0699\u06C0-\u06CB\u06D5]" '分割范围，有后尾的字符表达式
+        Private Const extendRang As String = "[\ufb50-\ufdff\ufe70-\ufeff]" '扩展区范围；FB50-FDFF ->区域A    FE70-FEFF -> 区域B
+        Private Const notExtendRang As String = "[^\ufb50-\ufdff\ufe70-\ufeff\s]+(\s[^\ufb50-\ufdff\ufe70-\ufeff\s]+)*" '不包含扩展区中部包含空格字符集；FB50-FDFF ->区域A    FE70-FEFF -> 区域B
         '特助转换区，扩展区反向转换的时候需要替换
         Const symbolRang As String = "[\)\(\]\[\}\{\>\<\»\«]"
         Private symbolList As Dictionary(Of String, String) = New Dictionary(Of String, String) From {
