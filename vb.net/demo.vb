@@ -5,7 +5,7 @@ Module demo
     '  | Author: Kerindax <1482152356@qq.com>
     '  +----------------------------------------------------------------------
     Sub Main()
-        Dim utils As New UyghurCharUtils
+        Dim utils As New Uyghur.CharUtils
         Dim source As String = "سالام VB.NET"
 
         Dim target1 As String = utils.Basic2Extend(source) '基本区 转换 扩展区
