@@ -6,7 +6,7 @@
 原项目地址：https://gitee.com/kerindax/UyghurCharUtils
 
 ### 贡献者
-Kerindax，Sherer
+Kerindax，Sherer，Bulut
 ### 使用说明
 
 1. Basic2Extend(source){}       基本区 转换 扩展区
