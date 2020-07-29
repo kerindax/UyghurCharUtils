@@ -7,9 +7,15 @@ import java.util.regex.Pattern;
 // | Author: Kerindax <1482152356@qq.com>
 // +----------------------------------------------------------------------
 public class UyghurCharUtils {
+    /**
+     * 补充替换函数接口
+     */
     private interface replaceCallBack {
         String replace(Matcher matcher);
     }
+    /**
+     * 补充替换函数
+     */
     private static String replaceAll(String string, String patternRang, replaceCallBack replacement) {
         if (string == null) {
             return null;
@@ -28,6 +34,26 @@ public class UyghurCharUtils {
             return sb.toString();
         }
         return string;
+    }
+    // 双目字列表，转换扩展区的时候需要替换
+    public class SpecialObject
+    {
+        private class SpecialItem{
+            private int[] value;
+            public void set(int[] value){
+                this.value = value;
+            }
+            public String getString(){
+                StringBuilder sb = new StringBuilder();
+                for(int item : this.value){
+                    sb.append(fromCharCode(item));
+                }
+                return sb.toString();
+            }
+        }
+        public SpecialItem basic = new SpecialItem();
+        public SpecialItem extend = new SpecialItem();
+        public SpecialItem link = new SpecialItem();
     }
 
     private final int BASIC = 0; //基本区形式  A
@@ -63,27 +89,21 @@ public class UyghurCharUtils {
     }
     // 单字母列表
     private HashMap<String, ArrayList> charCode = new HashMap<>();
-    // 双目字列表，转换扩展区的时候需要替换
-    public class SpecialObject
-    {
-        private class SpecialItem{
-            private int[] value;
-            public void set(int[] value){
-                this.value = value;
-            }
-            public String getString(){
-                StringBuilder sb = new StringBuilder();
-                for(int item : this.value){
-                    sb.append(fromCharCode(item));
+
+    private final ArrayList<SpecialObject> special = new ArrayList(){
+        {
+            add(new SpecialObject(){
+                {
+                    basic.set(new int[]{ 0x644, 0x627 });extend.set(new int[]{ 0xfefc }); link.set(new int[]{ 0xfee0, 0xfe8e });
                 }
-                return sb.toString();
-            }
+            });
+            add(new SpecialObject(){
+                {
+                    basic.set(new int[]{ 0x644, 0x627 });extend.set(new int[]{ 0xfefb }); link.set(new int[]{ 0xfedf, 0xfe8e });
+                }
+            });
         }
-        public SpecialItem basic = new SpecialItem();
-        public SpecialItem extend = new SpecialItem();
-        public SpecialItem link = new SpecialItem();
-    }
-    private ArrayList<SpecialObject> special = new ArrayList();
+    };
 
     public UyghurCharUtils() {
         for (int[] row : new int[][] {
@@ -140,23 +160,7 @@ public class UyghurCharUtils {
             }
         }
 
-        special.addAll(new ArrayList(){
-            {
-                add(new SpecialObject(){
-                    {
-                        basic.set(new int[]{ 0x644, 0x627 });extend.set(new int[]{ 0xfefc }); link.set(new int[]{ 0xfee0, 0xfe8e });
-                    }
-                });
-                add(new SpecialObject(){
-                    {
-                        basic.set(new int[]{ 0x644, 0x627 });extend.set(new int[]{ 0xfefb }); link.set(new int[]{ 0xfedf, 0xfe8e });
-                    }
-                });
-            }
-        });
-
     }
-
     /**
      * 基本区   转换   扩展区
      * @param source
