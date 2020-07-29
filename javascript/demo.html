@@ -25,5 +25,34 @@
 
     console.log(target3);
     console.log(target4);
+
+
+
+    var targent = "asd字符串?asd".replace(/[^a-zA-Z\']\?([a-zA-Z\'])/g,(ch,$1)=>{
+      return ' ' + $1.toUpperCase()
+    }).replace(/[^a-zA-Z\']+/g,' ')
+    console.log(targent)
+
+    var start = 5
+    var end = 20
+    var ret = Array.from(new Array(end + 1).keys())
+    .slice(start)
+    .filter((el)=>{
+      return (el-start)%3==0
+    })
+
+    run({
+      '8:00':function(){
+        //起床
+      }
+    })
+    function run(p){
+      setInterval(() => {
+        var d = new Date()
+        var time = d.getHours() + ':' + d.getMinutes()
+        if(p[time])p[time]()
+      }, 1000*60);
+    }
+    console.log(ret)
   </script>
 </body>
