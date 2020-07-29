@@ -15,6 +15,9 @@ namespace System.Runtime.CompilerServices
 
 namespace Uyghur
 {
+    /// <summary>
+    /// 补充对象函数
+    /// </summary>
     static class StringExtension
     {
         public static string Reverse(this string source)
@@ -26,6 +29,14 @@ namespace Uyghur
     }
     public class CharUtils
     {
+        // 双目字对象
+        private class SpecialObject
+        {
+            public int[] basic;
+            public int[] extend;
+            public int[] link;
+        }
+
         private const int BASIC = 0; //基本区形式  A
         private const int ALONE = 1; //单独形式    A
         private const int HEAD = 2; //头部形式     A_
@@ -37,9 +48,9 @@ namespace Uyghur
         private const string extendRang = @"[\ufb50-\ufdff\ufe70-\ufeff]"; //扩展区范围；FB50-FDFF ->区域A    FE70-FEFF -> 区域B
         private const string notExtendRang = @"[^\ufb50-\ufdff\ufe70-\ufeff\s]+(\s[^\ufb50-\ufdff\ufe70-\ufeff\s]+)*"; //不包含扩展区中部包含空格字符集；FB50-FDFF ->区域A    FE70-FEFF -> 区域B
 
-        ////特助转换区，扩展区反向转换的时候需要替换
-        const string symbolRang = @"[\)\(\]\[\}\{\>\<\»\«]";
-        private Dictionary<string, string> symbolList = new Dictionary<string, string> {
+        //特助转换区，扩展区反向转换的时候需要替换
+        private const string symbolRang = @"[\)\(\]\[\}\{\>\<\»\«]";
+        private static Dictionary<string, string> symbolList = new Dictionary<string, string> {
             {")","("},
             {"(","("},
             {"]","["},
@@ -50,23 +61,33 @@ namespace Uyghur
             {"»","«"},
             {"«","»"},
         };
-        private string fromCharCode(int number)
+        //数字转换对应的字母
+        private static string fromCharCode(int number)
         {
             return Convert.ToChar(number).ToString();
         }
+        // 双字母列表
+        private ArrayList special = new ArrayList(){
+            new SpecialObject(){
+                basic = new int[]{ 0x644, 0x627 },
+                extend = new int[]{ 0xfefc },
+                link = new int[]{ 0xfee0, 0xfe8e },
+            },
+            new SpecialObject(){
+                basic = new int[]{ 0x644, 0x627 },
+                extend = new int[]{ 0xfefb },
+                link = new int[]{ 0xfedf, 0xfe8e },
+            },
+        };
         // 单字母列表
         private Dictionary<string, ArrayList> charCode = new Dictionary<string, ArrayList>();
-        // 双目字列表，转换扩展区的时候需要替换
-        private class SpecialItem
-        {
-            public object basic { get; set; }
-            public object extend { get; set; }
-            public object link { get; set; }
-        }
-        private ArrayList special = new ArrayList();
 
         public CharUtils()
         {
+            /**
+            * 基本码, 单独形式, 头部形式, 中部形式, 后部形式]
+            * [  A  ,     A   ,    A_   ,   _A_  ,   _A   ]
+            */
             foreach (var row in new int[][] {
                 new int[] {0x626, 0xfe8b, 0xfe8b, 0xfe8c, 0xfe8c}, // 1 --- 00-Hemze
                 new int[] {0x627, 0xfe8d, 0xfe8d, 0xfe8e, 0xfe8e}, // 0 --- 01-a   
@@ -121,26 +142,6 @@ namespace Uyghur
                     }
                 }
             }
-
-            foreach (SpecialItem row in new ArrayList() {
-                new SpecialItem(){ 
-                    basic = new int[]{ 0x644, 0x627 },extend = new int[]{ 0xfefc },link = new int[]{ 0xfee0, 0xfe8e }// LA
-                },
-                 new SpecialItem(){
-                    basic = new int[]{ 0x644, 0x627 },extend = new int[]{ 0xfefb },link = new int[]{ 0xfedf, 0xfe8e }//_LA
-                },
-            }){
-                foreach (var item in row.GetType().GetProperties())
-                {
-                    StringBuilder str = new StringBuilder();
-                    foreach(var el in (int[])item.GetValue(row, null))//获取属性值
-                    {
-                        str.Append(fromCharCode(el));
-                    }
-                    item.SetValue(row, str.ToString(), null); //给对应属性赋值
-                }
-                special.Add(row);
-            };
         }
         /// <summary>
         /// 基本区   转换   扩展区
@@ -224,6 +225,9 @@ namespace Uyghur
         {
             return this.Extend2Basic(this.reverseSubject(this.reverseAscii(source)));
         }
+        /// <summary>
+        /// Ascii区反转
+        /// </summary>
         private string reverseAscii(string source)
         {
             return new Regex(notExtendRang).Replace(source, word =>
@@ -236,12 +240,18 @@ namespace Uyghur
                 });
             });
         }
-        private string reverseSubject(string str)// 反转
+        /// <summary>
+        /// 对象反转
+        /// </summary>
+        private string reverseSubject(string str)
         {
             return new Regex(@".+").Replace(str, subject => {
                 return subject.Value.Reverse();
             });
         }
+        /// <summary>
+        /// 获取对应字母
+        /// </summary>
         private string getChar(string ch, int index)
         {
             if (charCode.ContainsKey(ch))
@@ -249,21 +259,39 @@ namespace Uyghur
             else
                 return ch;
         }
+        /// <summary>
+        /// La字母转换扩展区
+        /// </summary>
         private string extendLa(string source)
         {
-            foreach(SpecialItem item in this.special)
+            foreach(SpecialObject item in this.special)
             {
-                source = source.Replace((string)item.link, (string)item.extend);
+                source = source.Replace(this.getString(item.link), this.getString(item.extend));
             }
             return source;
         }
+        /// <summary>
+        /// La字母转换基本区
+        /// </summary>
         private string basicLa(string source)
         {
-            foreach (SpecialItem item in this.special)
+            foreach (SpecialObject item in this.special)
             {
-                source = source.Replace((string)item.extend, (string)item.basic);
+                source = source.Replace(this.getString(item.extend), this.getString(item.basic));
             }
             return source;
+        }
+        /// <summary>
+        /// 双目字母转换字符串
+        /// </summary>
+        public String getString(int[] value)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (int item in value)
+            {
+                sb.Append(fromCharCode(item));
+            }
+            return sb.ToString();
         }
     }
 }

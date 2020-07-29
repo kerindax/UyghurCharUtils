@@ -8,13 +8,13 @@ import java.util.regex.Pattern;
 // +----------------------------------------------------------------------
 public class UyghurCharUtils {
     /**
-     * 补充替换函数接口
+     * 补充接口
      */
     private interface replaceCallBack {
         String replace(Matcher matcher);
     }
     /**
-     * 补充替换函数
+     * 补充函数
      */
     private static String replaceAll(String string, String patternRang, replaceCallBack replacement) {
         if (string == null) {
@@ -35,25 +35,12 @@ public class UyghurCharUtils {
         }
         return string;
     }
-    // 双目字列表，转换扩展区的时候需要替换
-    public class SpecialObject
+    // 双目字对象
+    private class SpecialObject
     {
-        private class SpecialItem{
-            private int[] value;
-            public void set(int[] value){
-                this.value = value;
-            }
-            public String getString(){
-                StringBuilder sb = new StringBuilder();
-                for(int item : this.value){
-                    sb.append(fromCharCode(item));
-                }
-                return sb.toString();
-            }
-        }
-        public SpecialItem basic = new SpecialItem();
-        public SpecialItem extend = new SpecialItem();
-        public SpecialItem link = new SpecialItem();
+        public int[] basic;
+        public int[] extend;
+        public int[] link;
     }
 
     private final int BASIC = 0; //基本区形式  A
@@ -67,7 +54,7 @@ public class UyghurCharUtils {
     private final String extendRang = "[\\ufb50-\\ufdff\\ufe70-\\ufeff]"; //扩展区范围；FB50-FDFF ->区域A    FE70-FEFF -> 区域B
     private final String notExtendRang = "[^\\ufb50-\\ufdff\\ufe70-\\ufeff\\s]+(\\s[^\\ufb50-\\ufdff\\ufe70-\\ufeff\\s]+)*"; //不包含扩展区中部包含空格字符集；FB50-FDFF ->区域A    FE70-FEFF -> 区域B
 
-    ////特助转换区，扩展区反向转换的时候需要替换
+    //特助转换区，扩展区反向转换的时候需要替换
     private final String symbolRang = "[\\)\\(\\]\\[\\}\\{\\>\\<\\»\\«]";
     private final HashMap<String, String> symbolList = new HashMap<>(){
         {
@@ -83,29 +70,38 @@ public class UyghurCharUtils {
             put("«", "»");
         }
     };
+    //数字转换对应的字母
     private final String fromCharCode(int number)
     {
         return String.valueOf((char) number);
     }
-    // 单字母列表
-    private HashMap<String, ArrayList> charCode = new HashMap<>();
-
-    private final ArrayList<SpecialObject> special = new ArrayList(){
+    // 双字母列表
+    private ArrayList<SpecialObject> special = new ArrayList(){
         {
             add(new SpecialObject(){
                 {
-                    basic.set(new int[]{ 0x644, 0x627 });extend.set(new int[]{ 0xfefc }); link.set(new int[]{ 0xfee0, 0xfe8e });
+                    basic = new int[]{ 0x644, 0x627 };
+                    extend = new int[]{ 0xfefc };
+                    link = new int[]{ 0xfee0, 0xfe8e };
                 }
             });
             add(new SpecialObject(){
                 {
-                    basic.set(new int[]{ 0x644, 0x627 });extend.set(new int[]{ 0xfefb }); link.set(new int[]{ 0xfedf, 0xfe8e });
+                    basic = new int[]{ 0x644, 0x627 };
+                    extend = new int[]{ 0xfefb };
+                    link = new int[]{ 0xfedf, 0xfe8e };
                 }
             });
         }
     };
+    // 单字母列表
+    private HashMap<String, ArrayList> charCode = new HashMap<>();
 
     public UyghurCharUtils() {
+        /**
+         * 基本码, 单独形式, 头部形式, 中部形式, 后部形式]
+         * [  A  ,     A   ,    A_   ,   _A_  ,   _A   ]
+         */
         for (int[] row : new int[][] {
             new int[] {0x626, 0xfe8b, 0xfe8b, 0xfe8c, 0xfe8c}, // 1 --- 00-Hemze
             new int[] {0x627, 0xfe8d, 0xfe8d, 0xfe8e, 0xfe8e}, // 0 --- 01-a
@@ -159,12 +155,11 @@ public class UyghurCharUtils {
                 }
             }
         }
-
     }
     /**
      * 基本区   转换   扩展区
      * @param source
-     * 要转换的内容
+     * 要转换的内容，可以包含混合字符串
      * @return
      * 已转换的内容
      */
@@ -215,9 +210,7 @@ public class UyghurCharUtils {
                 return extendLa(returns);
             }
         });
-
     }
-
     /**
      * 扩展区   转换   基本区
      * @param source
@@ -232,7 +225,6 @@ public class UyghurCharUtils {
             }
         });
     }
-
     /**
      * 基本区  转换   反向扩展区
      * @param source
@@ -253,6 +245,9 @@ public class UyghurCharUtils {
     public String RExtend2Basic(String source) {
         return this.Extend2Basic(this.reverseSubject(this.reverseAscii(source)));
     }
+    /**
+     * Ascii区反转
+     */
     private String reverseAscii(String source)
     {
         return replaceAll(source, notExtendRang, new replaceCallBack() {
@@ -270,7 +265,10 @@ public class UyghurCharUtils {
             }
         });
     }
-    private String reverseSubject(String str)// 反转
+    /**
+     * 对象反转
+     */
+    private String reverseSubject(String str)
     {
         return replaceAll(str, ".+", new replaceCallBack() {
             public String replace(Matcher m) {
@@ -278,6 +276,9 @@ public class UyghurCharUtils {
             }
         });
     }
+    /**
+     * 获取对应字母
+     */
     private String getChar(String ch, int index)
     {
         if (charCode.containsKey(ch))
@@ -285,21 +286,37 @@ public class UyghurCharUtils {
         else
             return ch;
     }
+    /**
+     * La字母转换扩展区
+     */
     private String extendLa(String source)
     {
         for(SpecialObject item : this.special)
         {
-            source = source.replace(item.link.getString(), item.extend.getString());
+            source = source.replace(this.getString(item.link), this.getString(item.extend));
         }
         return source;
     }
+    /**
+     * La字母转换基本区
+     */
     private String basicLa(String source)
     {
         for(SpecialObject item : this.special)
         {
-            source = source.replace(item.extend.getString(), item.basic.getString());
+            source = source.replace(this.getString(item.extend), this.getString(item.basic));
         }
         return source;
+    }
+    /**
+     * 双目字母转换字符串
+     */
+    public String getString(int[] value){
+        StringBuilder sb = new StringBuilder();
+        for(int item : value){
+            sb.append(fromCharCode(item));
+        }
+        return sb.toString();
     }
 
 }

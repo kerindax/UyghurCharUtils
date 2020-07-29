@@ -9,18 +9,26 @@ Imports System.Text.RegularExpressions
 Namespace Uyghur
 
     Public Class CharUtils
+        ' 双目字对象
+        Private Class SpecialObject
+            Public Property basic As Object
+            Public Property extend As Object
+            Public Property link As Object
+        End Class
+
         Private Const BASIC As Integer = 0 '基本区形式  A
         Private Const ALONE As Integer = 1 '单独形式    A
         Private Const HEAD As Integer = 2 '头部形式     A_
         Private Const CENTR As Integer = 3 '中部形式   _A_
         Private Const REAR As Integer = 4 '后部形式    _A
 
-        Private Const convertRang As String = "[\u0622-\u064a\u0675-\u06d5]+" '转换范围；不包含哈语的0x0621字母,问号,双引号和Unicode区域的符号
-        Private Const suffixRang As String = "[^\u0627\u062F-\u0632\u0648\u0688-\u0699\u06C0-\u06CB\u06D5]" '分割范围，有后尾的字符表达式
-        Private Const extendRang As String = "[\ufb50-\ufdff\ufe70-\ufeff]" '扩展区范围；FB50-FDFF ->区域A    FE70-FEFF -> 区域B
-        Private Const notExtendRang As String = "[^\ufb50-\ufdff\ufe70-\ufeff\s]+(\s[^\ufb50-\ufdff\ufe70-\ufeff\s]+)*" '不包含扩展区中部包含空格字符集；FB50-FDFF ->区域A    FE70-FEFF -> 区域B
+        Private Const convertRang As String = "[\u0622-\u064a\u0675-\u06d5]+"
+        Private Const suffixRang As String = "[^\u0627\u062F-\u0632\u0648\u0688-\u0699\u06C0-\u06CB\u06D5]"
+        Private Const extendRang As String = "[\ufb50-\ufdff\ufe70-\ufeff]"
+        Private Const notExtendRang As String = "[^\ufb50-\ufdff\ufe70-\ufeff\s]+(\s[^\ufb50-\ufdff\ufe70-\ufeff\s]+)*"
+
         '特助转换区，扩展区反向转换的时候需要替换
-        Const symbolRang As String = "[\)\(\]\[\}\{\>\<\»\«]"
+        Private Const symbolRang As String = "[\)\(\]\[\}\{\>\<\»\«]"
         Private symbolList As Dictionary(Of String, String) = New Dictionary(Of String, String) From {
             {")", "("},
             {"(", "("},
@@ -32,22 +40,28 @@ Namespace Uyghur
             {"»", "«"},
             {"«", "»"}
         }
-
-        Private Function fromCharCode(ByVal number As Integer) As String
+        '数字转换对应的字母
+        Public Shared Function fromCharCode(ByVal number As Integer) As String
             Return ChrW(number)
         End Function
+        ' 双字母列表
+        Private special As ArrayList = New ArrayList() From {
+            New SpecialObject() With {
+                .basic = New Integer() {&H644, &H627},
+                .extend = New Integer() {&HFEFC},
+                .link = New Integer() {&HFEE0, &HFE8E}
+            },
+            New SpecialObject() With {
+                .basic = {&H644, &H627},
+                .extend = {&HFEFB},
+                .link = {&HFEDF, &HFE8E}
+            }
+        }
         '单字母列表
         Private charCode As Dictionary(Of String, ArrayList) = New Dictionary(Of String, ArrayList)()
-        ' 双目字列表，转换扩展区的时候需要替换
-        Private Class SpecialItem
-            Public Property basic As Object
-            Public Property extend As Object
-            Public Property link As Object
-        End Class
-
-        Private special As ArrayList = New ArrayList()
-
         Public Sub New()
+            ' 基本码, 单独形式, 头部形式, 中部形式, 后部形式]
+            ' [  A  ,     A   ,    A_   ,   _A_  ,   _A   ]
             For Each row In New Integer()() {
                 New Integer() {&H626, &HFE8B, &HFE8B, &HFE8C, &HFE8C}, ' 1 --- 00-Hemze
                 New Integer() {&H627, &HFE8D, &HFE8D, &HFE8E, &HFE8E}, ' 0 --- 01-a   
@@ -100,32 +114,11 @@ Namespace Uyghur
                     End If
                 Next
             Next
-
-            For Each row As SpecialItem In New ArrayList() From {
-                New SpecialItem() With {
-                    .basic = New Integer() {&H644, &H627}, .extend = New Integer() {&HFEFC}, .link = New Integer() {&HFEE0, &HFE8E}
-                },
-                New SpecialItem() With {
-                    .basic = New Integer() {&H644, &H627}, .extend = New Integer() {&HFEFB}, .link = New Integer() {&HFEDF, &HFE8E}
-                }
-            }
-                For Each item In row.[GetType]().GetProperties()
-                    Dim str As StringBuilder = New StringBuilder()
-
-                    For Each el In CType(item.GetValue(row, Nothing), Integer()) '获取属性值
-                        str.Append(fromCharCode(el))
-                    Next
-
-                    item.SetValue(row, str.ToString(), Nothing) '给对应属性赋值
-                Next
-
-                special.Add(row)
-            Next
         End Sub
         ''' <summary>
         ''' 基本区   转换   扩展区
         ''' </summary>
-        ''' <param name="source">要转换的内容</param>
+        ''' <param name="source">要转换的内容，可以包含混合字符串</param>
         ''' <returns>已转换的内容</returns>
         Public Function Basic2Extend(ByVal source As String) As String
             Return New Regex(convertRang).Replace(source,
@@ -198,7 +191,9 @@ Namespace Uyghur
         Public Function RExtend2Basic(ByVal source As String) As String
             Return Me.Extend2Basic(Me.reverseSubject(Me.reverseAscii(source)))
         End Function
-
+        ''' <summary>
+        ''' Ascii区反转
+        ''' </summary>
         Private Function reverseAscii(ByVal source As String) As String
             Return New Regex(notExtendRang).Replace(source,
                 Function(word)
@@ -212,11 +207,15 @@ Namespace Uyghur
                         End Function)
                 End Function)
         End Function
-
-        Private Function reverseSubject(ByVal str As String) As String '反转
+        ''' <summary>
+        ''' 对象反转
+        ''' </summary>
+        Private Function reverseSubject(ByVal str As String) As String
             Return New Regex(".+").Replace(str, Function(subject) StrReverse(subject.Value))
         End Function
-
+        ''' <summary>
+        ''' 获取对应字母
+        ''' </summary>
         Private Function getChar(ByVal ch As String, ByVal index As Integer) As String
             If charCode.ContainsKey(ch) Then
                 Return charCode(ch)(index).ToString()
@@ -224,19 +223,33 @@ Namespace Uyghur
                 Return ch
             End If
         End Function
-
+        ''' <summary>
+        ''' La字母转换扩展区
+        ''' </summary>
         Private Function extendLa(ByVal source As String) As String
-            For Each item As SpecialItem In Me.special
-                source = source.Replace(CStr(item.link), CStr(item.extend))
+            For Each item As SpecialObject In Me.special
+                source = source.Replace(Me.getString(item.link), Me.getString(item.extend))
             Next
             Return source
         End Function
-
+        ''' <summary>
+        ''' La字母转换基本区
+        ''' </summary>
         Private Function basicLa(ByVal source As String) As String
-            For Each item As SpecialItem In Me.special
-                source = source.Replace(CStr(item.extend), CStr(item.basic))
+            For Each item As SpecialObject In Me.special
+                source = source.Replace(Me.getString(item.extend), Me.getString(item.basic))
             Next
             Return source
+        End Function
+        ''' <summary>
+        ''' 双目字母转换字符串
+        ''' </summary>
+        Public Function getString(value As Integer()) As String
+            Dim sb As StringBuilder = New StringBuilder()
+            For Each item As Integer In value
+                sb.Append(fromCharCode(item))
+            Next
+            Return sb.ToString()
         End Function
     End Class
 End Namespace
