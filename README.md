@@ -6,7 +6,7 @@
 原项目地址：https://gitee.com/kerindax/UyghurCharUtils
 
 ### 贡献者
-Kerindax，Sherer
+Kerindax，Sherer，Bulut
 ### 使用说明
 
 1. Basic2Extend(source){}       基本区 转换 扩展区
@@ -126,4 +126,20 @@ Sub Main()
     Dim target4 As String = utils.RExtend2Basic(target3) '反向扩展区 转换 基本区
     MsgBox(target1 + vbCrLf + target2 + vbCrLf + target3 + vbCrLf + target4)
 End Sub
+```
+- java
+```java
+public class demo {
+    public static void main(String[] args) {
+        UyghurCharUtils utils = new UyghurCharUtils();
+        String source = "سالام Java";
+
+        String target1 = utils.Basic2Extend(source);//基本区 转换 扩展区
+        String target2 = utils.Extend2Basic(target1);//基本区 转换 扩展区
+
+        String target3 = utils.Basic2RExtend(source);//基本区 转换 扩展区
+        String target4 = utils.RExtend2Basic(target3);//基本区 转换 扩展区
+        System.out.println(target1 + "\n" + target2 + "\n" + target3 + "\n" + target4);
+    }
+}
 ```
