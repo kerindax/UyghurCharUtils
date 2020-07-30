@@ -1,9 +1,10 @@
 # UyghurCharUtils
 
 ### 项目介绍
-维吾尔语，哈萨克语，柯尔克孜语基本区和扩展区转换函数类库
-
-原项目地址：https://gitee.com/kerindax/UyghurCharUtils
+##### 维吾尔语，哈萨克语，柯尔克孜语基本区和扩展区转换函数类库
+##### v1版本已完成的语言：javascript，php，csharp，vb.net，mysql，java，golang
+##### v1版本地址：https://gitee.com/kerindax/UyghurCharUtils/tree/v1.x/
+##### v2版本项目地址：https://gitee.com/kerindax/UyghurCharUtils
 
 ### 贡献者
 Kerindax，Sherer，Bulut
