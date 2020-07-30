@@ -1,4 +1,11 @@
 <?php
+// +----------------------------------------------------------------------
+// | Update: 2020-06-21 00:00
+// +----------------------------------------------------------------------
+// | Author: Kerindax <1482152356@qq.com>
+// +----------------------------------------------------------------------
+
+// 补充函数
 if (!function_exists('mb_str_replace'))
 {
    function mb_str_replace($search, $replace, $subject, &$count = 0)
@@ -25,6 +32,7 @@ if (!function_exists('mb_str_replace'))
       return $subject;
    }
 }
+// 补充函数
 if (!function_exists('mb_str_reverse'))
 {
     function mb_str_reverse($source){
@@ -32,11 +40,7 @@ if (!function_exists('mb_str_reverse'))
         return implode("", array_reverse($arr[0]));
     }
 }
-// +----------------------------------------------------------------------
-// | Update: 2020-06-21 00:00
-// +----------------------------------------------------------------------
-// | Author: Kerindax <1482152356@qq.com>
-// +----------------------------------------------------------------------
+
 const BASIC = 0; //基本区形式  A
 const ALONE = 1; //单独形式    A
 const HEAD  = 2; //头部形式    A_
@@ -62,19 +66,26 @@ const symbolList = [
   '»'=> '«',
   '«'=> '»',
 ];
-
+// 数字转换对应的字母
 function fromCharCode($code){
     return mb_convert_encoding('&#x'.dechex($code).';', 'UTF-8', 'HTML-ENTITIES'); 
 };
 
 class UyghurCharUtils {
+    // 双字母列表
+    private $special = [
+        [ 'basic'=> [0x644, 0x627], 'extend'=> [0xfefc], 'link'=> [0xfee0, 0xfe8e], ],// LA
+        [ 'basic'=> [0x644, 0x627], 'extend'=> [0xfefb], 'link'=> [0xfedf, 0xfe8e], ],//_LA
+    ];
     // 单字母列表
     private $charCode = [];
-    // 双目字列表，转换扩展区的时候需要替换
-    private $special = [];
 
     function __construct() {
         mb_internal_encoding("UTF-8");
+        /**
+         * 基本码, 单独形式, 头部形式, 中部形式, 后部形式]
+         * [  A  ,     A   ,    A_   ,   _A_  ,   _A   ]
+         */
         foreach ([
             [0x626, 0xfe8b, 0xfe8b, 0xfe8c, 0xfe8c], // 1 --- 00-Hemze
             [0x627, 0xfe8d, 0xfe8d, 0xfe8e, 0xfe8e], // 0 --- 01-a   
@@ -122,18 +133,6 @@ class UyghurCharUtils {
                 $this->charCode[$item] = $list;
             }
         }
-        // 双目字列表，转换扩展区的时候需要替换
-        $this->special = array_map(function($row){
-            foreach ($row as $key => $item){
-                $row[$key] = join("",array_map(function($el){
-                    return fromCharCode($el);
-                },$row[$key]));
-            }
-            return $row;
-        },[
-            [ 'basic'=> [0x644, 0x627], 'extend'=> [0xfefc], 'link'=> [0xfee0, 0xfe8e], ],// LA
-            [ 'basic'=> [0x644, 0x627], 'extend'=> [0xfefb], 'link'=> [0xfedf, 0xfe8e], ],//_LA
-        ]);
     }
     /**
      * 基本区   转换   扩展区
@@ -202,6 +201,9 @@ class UyghurCharUtils {
     public function RExtend2Basic($source){
         return $this->Extend2Basic($this->reverseSubject($this->reverseAscii($source)));
     }
+    /**
+     * Ascii区反转
+     */
     private function reverseAscii($source){
         return preg_replace_callback(symbolRang,function($ch){//替换符号
             return $this->symbolList[$ch[0]] || $ch[0];
@@ -209,11 +211,17 @@ class UyghurCharUtils {
             return mb_str_reverse($word[0]);
         },$source));
     }
-    private function reverseSubject($str){// 反转
+    /**
+     * 对象反转
+     */
+    private function reverseSubject($str){
         return preg_replace_callback("/(.+)/u",function($subject){//不包含换行符
             return mb_str_reverse($subject[0]);
         },$str);
     }
+    /**
+     * 获取对应字母
+     */
     private function getChar($ch, $index){
         if(array_key_exists($ch,$this->charCode)){
             return $this->charCode[$ch][$index];
@@ -221,16 +229,32 @@ class UyghurCharUtils {
             return $ch;
         }
     }
+    /**
+     * La字母转换扩展区
+     */
     private function extendLa($source){
         foreach ($this->special as $item){
-            $source = mb_str_replace($item['link'], $item['extend'],$source);
+            $source = mb_str_replace($this->getString($item['link']), $this->getString($item['extend']),$source);
         }
         return $source;
     }
+    /**
+     * La字母转换基本区
+     */
     private function basicLa($source){
         foreach ($this->special as $item){
-            $source = mb_str_replace($item['extend'], $item['basic'],$source);
+            $source = mb_str_replace($this->getString($item['extend']), $this->getString($item['basic']),$source);
         }
         return $source;
+    }
+    /**
+     * 双目字母转换字符串
+     */
+    private function getString($value){
+        $sb = array('');
+        foreach ($value as $item){
+            array_push($sb,fromCharCode($item));
+        }
+        return implode("",$sb);
     }
 }
