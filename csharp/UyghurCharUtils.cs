@@ -152,46 +152,26 @@ namespace Uyghur
         {
             return new Regex(convertRang).Replace(source, word => {
                 string returns =
-                    new Regex(@"\s(\S)(\S)").Replace(//中部字母-前部有尾
-                    new Regex(@"\s(\S)$").Replace(//最后字母-前部有尾
-                    new Regex(@"\s(\S)\s").Replace(//中部字母-前后有尾
-                    new Regex(@"(\S)(\S)\s").Replace(//中部字母-后部有尾
-                    new Regex(@"^(\S)\s").Replace(//首字母-后部有尾
-                    new Regex(@"(\S)(\S)(\S)").Replace(//中部字母-没有尾
-                    new Regex(@"(\S)(\S)$").Replace(//最后字母-没有尾
-                    new Regex(@"^(\S)(\S)").Replace(//首字母-没有尾
-                    new Regex(@"^(\S)$").Replace(//单字母
-                    new Regex(suffixRang).Replace(
+                    new Regex(@"\s(\S)(?=\S|$)").Replace(
+                    new Regex(@"\s(\S)\s").Replace(
+                    new Regex(@"(?<=\S|^)(\S)\s").Replace(
+                    new Regex(@"(?<=^|\S)(\S)(?=$|\S)").Replace(
+                     new Regex(suffixRang).Replace(
                     word.Value, ch =>
                     {
                         return ch + "  ";
                     }).Trim(), ch =>
                     {
-                        return getChar(ch.Result("$1"), ALONE);//单字母
+                        return this.getChar(ch.Result("$1"), ALONE);
                     }), ch =>
                     {
-                        return this.getChar(ch.Result("$1"), ALONE) + ch.Result("$2");//首字母-没有尾
+                        return this.getChar(ch.Result("$1"), HEAD);
                     }), ch =>
                     {
-                        return ch.Result("$1") + this.getChar(ch.Result("$2"), ALONE);//最后字母-没有尾
+                        return this.getChar(ch.Result("$1"), CENTR);
                     }), ch =>
                     {
-                        return ch.Result("$1") + this.getChar(ch.Result("$2"), ALONE) + ch.Result("$3");//中部字母-没有尾
-                    }), ch =>
-                    {
-                        return this.getChar(ch.Result("$1"), HEAD);//首字母-后部有尾
-                    }), ch =>
-                    {
-                        return ch.Result("$1") + this.getChar(ch.Result("$2"), HEAD);//中部字母-后部有尾
-                    }), ch =>
-                    {
-                        return this.getChar(ch.Result("$1"), CENTR);//中部字母-前后有尾
-                    }), ch =>
-                    {
-                        return this.getChar(ch.Result("$1"), REAR);//最后字母-前部有尾
-                    }), ch =>
-                    {
-                        return this.getChar(ch.Result("$1"), REAR) + ch.Result("$2");//中部字母-前部有尾
+                        return this.getChar(ch.Result("$1"), REAR)
                     });
                 return this.extendLa(returns);
             });

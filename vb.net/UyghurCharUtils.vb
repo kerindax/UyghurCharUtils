@@ -124,45 +124,25 @@ Namespace Uyghur
             Return New Regex(convertRang).Replace(source,
                 Function(word)
                     Dim returns As String =
-                        New Regex("\s(\S)(\S)").Replace( '中部字母-前部有尾
-                        New Regex("\s(\S)$").Replace( '最后字母-前部有尾
-                        New Regex("\s(\S)\s").Replace( '中部字母-前后有尾
-                        New Regex("(\S)(\S)\s").Replace( '中部字母-后部有尾
-                        New Regex("^(\S)\s").Replace( '首字母-后部有尾
-                        New Regex("(\S)(\S)(\S)").Replace( '中部字母-没有尾
-                        New Regex("(\S)(\S)$").Replace( '最后字母-没有尾
-                        New Regex("^(\S)(\S)").Replace( '首字母-没有尾
-                        New Regex("^(\S)$").Replace( '单字母
+                        New Regex("\s(\S)(?=\S|$)").Replace(
+                        New Regex("\s(\S)\s").Replace(
+                        New Regex("(?<=\S|^)(\S)\s").Replace(
+                        New Regex("(?<=^|\S)(\S)(?=$|\S)").Replace(
                         New Regex(suffixRang).Replace(word.Value,
                         Function(ch)
                             Return ch.Value & "  "
                         End Function).Trim(),
                         Function(ch)
-                            Return getChar(ch.Result("$1"), ALONE) '单字母
+                            Return Me.getChar(ch.Result("$1"), ALONE)
                         End Function),
                         Function(ch)
-                            Return Me.getChar(ch.Result("$1"), ALONE) & ch.Result("$2") '首字母-没有尾
+                            Return Me.getChar(ch.Result("$1"), HEAD)
                         End Function),
                         Function(ch)
-                            Return ch.Result("$1") & Me.getChar(ch.Result("$2"), ALONE) '最后字母-没有尾
+                            Return Me.getChar(ch.Result("$1"), CENTR)
                         End Function),
                         Function(ch)
-                            Return ch.Result("$1") & Me.getChar(ch.Result("$2"), ALONE) & ch.Result("$3") '中部字母-没有尾
-                        End Function),
-                        Function(ch)
-                            Return Me.getChar(ch.Result("$1"), HEAD) '首字母-后部有尾
-                        End Function),
-                        Function(ch)
-                            Return ch.Result("$1") & Me.getChar(ch.Result("$2"), HEAD) '中部字母-后部有尾
-                        End Function),
-                        Function(ch)
-                            Return Me.getChar(ch.Result("$1"), CENTR) '中部字母-前后有尾
-                        End Function),
-                        Function(ch)
-                            Return Me.getChar(ch.Result("$1"), REAR) '最后字母-前部有尾
-                        End Function),
-                        Function(ch)
-                            Return Me.getChar(ch.Result("$1"), REAR) & ch.Result("$2") '中部字母-前部有尾
+                            Return Me.getChar(ch.Result("$1"), REAR)
                         End Function)
                     Return Me.extendLa(returns)
                 End Function)

@@ -106,33 +106,18 @@
                         return ch + '  ';
                     })
                     .trim()
-                    .replace(/^(\S)$/, function (ch, $1) {//单字母
+                    .replace(/(?<=^|\S)(\S)(?=$|\S)/g, function($0, $1) {
                         return getChar($1, ALONE);
                     })
-                    .replace(/^(\S)(\S)/g, function (ch, $1, $2) {//首字母-没有尾
-                        return getChar($1, ALONE) + $2;
-                    })
-                    .replace(/(\S)(\S)$/, function (ch, $1, $2) {//最后字母-没有尾
-                        return $1 + getChar($2, ALONE);
-                    })
-                    .replace(/(\S)(\S)(\S)/g, function (ch, $1, $2, $3) {//中部字母-没有尾
-                        return $1 + getChar($2, ALONE) + $3;
-                    })
-                    .replace(/^(\S)\s/g, function (ch, $1) {//首字母-后部有尾
+                    .replace(/(?<=\S|^)(\S)\s/g, function($0,$1) {
                         return getChar($1, HEAD);
                     })
-                    .replace(/(\S)(\S)\s/g, function (ch, $1, $2) {//中部字母-后部有尾
-                        return $1 + getChar($2, HEAD);
-                    })
-                    .replace(/\s(\S)\s/g, function (ch, $1) {//中部字母-前后有尾
+                    .replace(/\s(\S)\s/g, function($0,$1) {
                         return getChar($1, CENTR);
                     })
-                    .replace(/\s(\S)$/, function (ch, $1) {//最后字母-前部有尾
+                    .replace(/\s(\S)(?=\S|$)/g, function($0,$1) {
                         return getChar($1, REAR);
                     })
-                    .replace(/\s(\S)(\S)/g, function (ch, $1, $2) {//中部字母-前部有尾
-                        return getChar($1, REAR) + $2;
-                    });
                 return extendLa(returns);
             });
         };
