@@ -141,38 +141,22 @@ class UyghurCharUtils {
      */
     public function Basic2Extend($source){
         return preg_replace_callback(convertRang,function($word){
-            $returns = preg_replace_callback("/\s(\S)(\S)/u",function($ch){//中部字母-前部有尾
-                return $this->getChar($ch[1], REAR) . $ch[2];
+            $returns = preg_replace_callback("/\s(\S)(?=\S|$)/u",function($ch){
+                return $this->getChar($ch[2], REAR);
             },
-            preg_replace_callback("/\s(\S)$/u",function($ch){//最后字母-前部有尾
-                return $this->getChar($ch[1], REAR);
-            },
-            preg_replace_callback("/\s(\S)\s/u",function($ch){//中部字母-前后有尾
-                
+            preg_replace_callback("/\s(\S)\s/u",function($ch){
                 return $this->getChar($ch[1], CENTR);
             },
-            preg_replace_callback("/(\S)(\S)\s/u",function($ch){//中部字母-后部有尾
-                return $ch[1] . $this->getChar($ch[2], HEAD);
-            },
-            preg_replace_callback("/^(\S)\s/u",function($ch){//首字母-后部有尾
+            preg_replace_callback("/(?<=\S|^)(\S)\s/u",function($ch){
                 return $this->getChar($ch[1], HEAD);
             },
-            preg_replace_callback("/(\S)(\S)(\S)/u",function($ch){//中部字母-没有尾
-                return $ch[1] . $this->getChar($ch[2], ALONE) . $ch[3];
-            },
-            preg_replace_callback("/(\S)(\S)$/u",function($ch){//最后字母-没有尾
-                return $ch[1] . $this->getChar($ch[2], ALONE);
-            },
-            preg_replace_callback("/^(\S)(\S)/u",function($ch){//首字母-没有尾
-                return $this->getChar($ch[1], ALONE) . $ch[2];
-            },
-            preg_replace_callback("/^(\S)$/u",function($ch){//单字母
+            preg_replace_callback("/(?<=^|\S)(\S)(?=$|\S)/u",function($ch){
                 return $this->getChar($ch[1], ALONE);
             },
             trim(preg_replace_callback(suffixRang,function($ch){
                 return $ch[0] . '  ';
             },
-            $word[0])))))))))));
+            $word[0]))))));
             return $this->extendLa($returns);
         }, $source);
     }

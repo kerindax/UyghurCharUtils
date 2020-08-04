@@ -1,5 +1,5 @@
 // +----------------------------------------------------------------------
-// | Update: 2020-07-30 00:00
+// | Update: 2020-08-04 00:00
 // +----------------------------------------------------------------------
 // | Author: Kerindax <1482152356@qq.com>
 // +----------------------------------------------------------------------
@@ -106,33 +106,18 @@
                         return ch + '  ';
                     })
                     .trim()
-                    .replace(/^(\S)$/, function (ch, $1) {//单字母
+                    .replace(/(?<=^|\S)(\S)(?=$|\S)/g, function (ch, $1) {
                         return getChar($1, ALONE);
                     })
-                    .replace(/^(\S)(\S)/g, function (ch, $1, $2) {//首字母-没有尾
-                        return getChar($1, ALONE) + $2;
-                    })
-                    .replace(/(\S)(\S)$/, function (ch, $1, $2) {//最后字母-没有尾
-                        return $1 + getChar($2, ALONE);
-                    })
-                    .replace(/(\S)(\S)(\S)/g, function (ch, $1, $2, $3) {//中部字母-没有尾
-                        return $1 + getChar($2, ALONE) + $3;
-                    })
-                    .replace(/^(\S)\s/g, function (ch, $1) {//首字母-后部有尾
+                    .replace(/(?<=\S|^)(\S)\s/g, function (ch, $1) {
                         return getChar($1, HEAD);
                     })
-                    .replace(/(\S)(\S)\s/g, function (ch, $1, $2) {//中部字母-后部有尾
-                        return $1 + getChar($2, HEAD);
-                    })
-                    .replace(/\s(\S)\s/g, function (ch, $1) {//中部字母-前后有尾
+                    .replace(/\s(\S)\s/g, function (ch, $1) {
                         return getChar($1, CENTR);
                     })
-                    .replace(/\s(\S)$/, function (ch, $1) {//最后字母-前部有尾
+                    .replace(/\s(\S)(?=\S|$)/g, function (ch, $1) {
                         return getChar($1, REAR);
                     })
-                    .replace(/\s(\S)(\S)/g, function (ch, $1, $2) {//中部字母-前部有尾
-                        return getChar($1, REAR) + $2;
-                    });
                 return extendLa(returns);
             });
         };
@@ -141,9 +126,9 @@
          * @param source 要转换的内容
          * @return 已转换的内容
          */
-        this.Extend2Basic = function(source) {
+        this.Extend2Basic = function (source) {
             return basicLa(source).replace(extendRang, function (ch) {
-            return getChar(ch, BASIC)
+                return getChar(ch, BASIC)
             });
         };
         /**
@@ -151,7 +136,7 @@
          * @param source 要转换的内容
          * @return 已转换的内容
          */
-        this.Basic2RExtend = function(source) {
+        this.Basic2RExtend = function (source) {
             return this.reverseAscii(this.reverseSubject(this.Basic2Extend(source)));
         };
         /**
@@ -159,59 +144,59 @@
          * @param source 要转换的内容
          * @return 已转换的内容
          */
-        this.RExtend2Basic = function(source) {
+        this.RExtend2Basic = function (source) {
             return this.Extend2Basic(this.reverseSubject(this.reverseAscii(source)));
         };
         /**
          * Ascii区反转
          */
-        this.reverseAscii = function(source) {
+        this.reverseAscii = function (source) {
             return source.replace(notExtendRang, function (word) {
                 return word.split("").reverse().join("")
-                    .replace(symbolRang, function(ch) {
-                    return symbolList[ch] || ch;
+                    .replace(symbolRang, function (ch) {
+                        return symbolList[ch] || ch;
                     });
             });
         };
         /**
          * 对象反转
          */
-        this.reverseSubject = function(str) {
+        this.reverseSubject = function (str) {
             return str.replace(/.+/g, function (subject) {
-            return subject.split("").reverse().join("");
+                return subject.split("").reverse().join("");
             });
         };
         /**
          * 获取对应字母
          */
-        var getChar = function(ch, index) {
+        var getChar = function (ch, index) {
             var item = charCode[ch];
             return item ? item[index] : ch;
         };
         /**
          * La字母转换扩展区
          */
-        var extendLa = function(source) {
+        var extendLa = function (source) {
             special.forEach(function (item) {
-            source = source.replace(getString(item.link), getString(item.extend));
+                source = source.replace(getString(item.link), getString(item.extend));
             });
             return source;
         };
         /**
          * La字母转换基本区
          */
-        var basicLa = function(source) {
+        var basicLa = function (source) {
             special.forEach(function (item) {
-            source = source.replace(getString(item.extend), getString(item.basic));
+                source = source.replace(getString(item.extend), getString(item.basic));
             });
             return source;
         };
         /**
          * 双目字母转换字符串
          */
-        var getString = function(value){
+        var getString = function (value) {
             return value.map(function (el) {
-            return fromCharCode(el)
+                return fromCharCode(el)
             }).join('')
         }
     }
