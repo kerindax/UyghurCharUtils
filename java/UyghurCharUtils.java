@@ -170,19 +170,19 @@ public class UyghurCharUtils {
                     public String replace(Matcher m) {
                         return m.group(0) + "  ";
                     }
-                }).trim(), "(?<=^|\\S)(\\S)(?=$|\\S)", new replaceCallBack() {//中部字母-后部有尾
+                }).trim(), "(?<=^|\\S)(\\S)(?=$|\\S)", new replaceCallBack() {
                     public String replace(Matcher m) {
                         return getChar(m.group(1), ALONE);
                     }
-                }), "(?<=\\S|^)(\\S)\\s", new replaceCallBack() {//中部字母-前后有尾
+                }), "(?<=\\S|^)(\\S)\\s", new replaceCallBack() {
                     public String replace(Matcher m) {
                         return getChar(m.group(1), HEAD);
                     }
-                }), "\\s(\\S)\\s", new replaceCallBack() {//最后字母-前部有尾
+                }), "\\s(\\S)\\s", new replaceCallBack() {
                     public String replace(Matcher m) {
                         return getChar(m.group(1), CENTR);
                     }
-                }), "\\s(\\S)(?=\\S|$)", new replaceCallBack() {//中部字母-前部有尾
+                }), "\\s(\\S)(?=\\S|$)", new replaceCallBack() {
                     public String replace(Matcher m) {
                         return getChar(m.group(1), REAR);
                     }

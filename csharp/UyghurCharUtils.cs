@@ -156,7 +156,7 @@ namespace Uyghur
                     new Regex(@"\s(\S)\s").Replace(
                     new Regex(@"(?<=\S|^)(\S)\s").Replace(
                     new Regex(@"(?<=^|\S)(\S)(?=$|\S)").Replace(
-                     new Regex(suffixRang).Replace(
+                    new Regex(suffixRang).Replace(
                     word.Value, ch =>
                     {
                         return ch + "  ";
