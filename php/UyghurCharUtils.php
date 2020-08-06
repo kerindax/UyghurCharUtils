@@ -142,7 +142,7 @@ class UyghurCharUtils {
     public function Basic2Extend($source){
         return preg_replace_callback(convertRang,function($word){
             $returns = preg_replace_callback("/\s(\S)(?=\S|$)/u",function($ch){
-                return $this->getChar($ch[2], REAR);
+                return $this->getChar($ch[1], REAR);
             },
             preg_replace_callback("/\s(\S)\s/u",function($ch){
                 return $this->getChar($ch[1], CENTR);
