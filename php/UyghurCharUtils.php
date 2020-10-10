@@ -190,7 +190,7 @@ class UyghurCharUtils {
      */
     private function reverseAscii($source){
         return preg_replace_callback(symbolRang,function($ch){//替换符号
-            return $this->symbolList[$ch[0]] || $ch[0];
+            return symbolList[$ch[0]] ?? $ch[0];
         },preg_replace_callback(notExtendRang,function($word){
             return mb_str_reverse($word[0]);
         },$source));
